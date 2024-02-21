@@ -41,6 +41,7 @@ public class Startup
         services.AddScoped<SectorService>();
         services.AddScoped<ComunaService>();
         services.AddScoped<RolService>();
+        services.AddScoped<UsuarioService>();
         services.AddScoped<EjecutarSP>();
         services.AddScoped<Conexion>();
     }

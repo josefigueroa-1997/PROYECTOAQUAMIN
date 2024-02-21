@@ -58,3 +58,4 @@ G:\arriendonet\ProyectoAquamin\PROYECTOAQUAMIN\ApiAquamin\ApiAquamin\obj\Debug\n
 G:\arriendonet\ProyectoAquamin\PROYECTOAQUAMIN\ApiAquamin\ApiAquamin\obj\Debug\net6.0\ApiAquamin.pdb
 G:\arriendonet\ProyectoAquamin\PROYECTOAQUAMIN\ApiAquamin\ApiAquamin\obj\Debug\net6.0\ApiAquamin.genruntimeconfig.cache
 G:\arriendonet\ProyectoAquamin\PROYECTOAQUAMIN\ApiAquamin\ApiAquamin\obj\Debug\net6.0\ref\ApiAquamin.dll
+G:\arriendonet\ProyectoAquamin\PROYECTOAQUAMIN\ApiAquamin\ApiAquamin\bin\Debug\net6.0\BCrypt.Net-Next.dll

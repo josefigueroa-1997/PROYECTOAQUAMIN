@@ -1,9 +1,10 @@
 {
   "version": 2,
-  "dgSpecHash": "ZL69zBiE+c8wMHH/t+qXSycjgDqQldS8YkPecLIwY5KEmMBCScoirabdo+lxzyspcT9wVGSERfloYRfGNPrXKg==",
+  "dgSpecHash": "W//M4JG4wwU3bYleziza3xUlvufCUbYHaNvyS9TkCe/n8tjcecX0ZrmXuU+1Pd1czY7iwQaPI42yBXybVKyJLA==",
   "success": true,
   "projectFilePath": "G:\\arriendonet\\ProyectoAquamin\\PROYECTOAQUAMIN\\ApiAquamin\\ApiAquamin\\ApiAquamin.csproj",
   "expectedPackageFiles": [
+    "C:\\Users\\holan\\.nuget\\packages\\bcrypt.net-next\\4.0.3\\bcrypt.net-next.4.0.3.nupkg.sha512",
     "C:\\Users\\holan\\.nuget\\packages\\humanizer.core\\2.8.26\\humanizer.core.2.8.26.nupkg.sha512",
     "C:\\Users\\holan\\.nuget\\packages\\microsoft.csharp\\4.5.0\\microsoft.csharp.4.5.0.nupkg.sha512",
     "C:\\Users\\holan\\.nuget\\packages\\microsoft.data.sqlclient\\2.1.4\\microsoft.data.sqlclient.2.1.4.nupkg.sha512",
