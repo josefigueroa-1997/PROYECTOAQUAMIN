@@ -19,7 +19,10 @@ namespace ApiAquamin.Services
             try
             {
                 bool registrar = await ejecutarSP.RegistrarUsuario(usuario);
-                return true;
+                if (registrar)
+                    return true;
+                else
+                    return false;
             }
             catch (Exception e)
             {
@@ -53,6 +56,37 @@ namespace ApiAquamin.Services
             {
                 Debug.WriteLine($"Erro al actualizar los datos:{e.Message}");
                 return false;
+            }
+        }
+
+        public async Task<bool> EliminarUsuario(int id)
+        {
+            try
+            {
+                bool eliminar = await ejecutarSP.EliminarUsuario(id);
+                if (eliminar)
+                    return true;
+                else
+                    return false;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al eliminar al usuario:{e.Message}");
+                return false;
+            }
+        }
+
+        public async Task<LoginDTO> IniciarSesion([FromBody] Login login)
+        {
+            try
+            {
+                LoginDTO credenciales = await ejecutarSP.IniciarSesion(login);
+                return credenciales;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al iniciar sesion_{e.Message}");
+                return new LoginDTO();
             }
         }
 

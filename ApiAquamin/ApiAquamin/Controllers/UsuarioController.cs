@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ApiAquamin.Services;
 using ApiAquamin.Models.Formularios;
+using ApiAquamin.DTO;
 
 namespace ApiAquamin.Controllers
 {
@@ -47,6 +48,24 @@ namespace ApiAquamin.Controllers
                 return Ok("Exito en la actualización de los datos del usuarios");
             else
                 return BadRequest("Hubo un error al actualizar los datos del usuario");
+        }
+        [HttpDelete]
+        [Route("DeleteUsuario/{id}")]
+        public async Task<IActionResult> DeleteUsuario(int id)
+        {
+            bool resultado = await usuarioservice.EliminarUsuario(id);
+            if (resultado)
+                return Ok("Usuario eliminado con éxito");
+            else
+                return BadRequest("No se pudo eliminar el usuario");
+        }
+        [HttpPost]
+        [Route("IniciarSesion")]
+        public async Task<IActionResult> IniciarSesion([FromBody] Login usuario) 
+        {
+            LoginDTO resultado = await usuarioservice.IniciarSesion(usuario);
+            return Ok(resultado);
+        
         }
     }
 }

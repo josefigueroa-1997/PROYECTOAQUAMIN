@@ -130,7 +130,8 @@ namespace ApiAquamin.Models
             
 
         }
-
+        //AQUI COMIENZAN LOS METODOS DE USUARIO
+        //REGISTRAR USUARIO
         public async Task<bool> RegistrarUsuario([FromBody] CrearUsuario usuario)
         {
             try
@@ -161,8 +162,15 @@ namespace ApiAquamin.Models
                     cmd.Parameters.Add(new SqlParameter("@IDROL", SqlDbType.Int) { Value = usuario.IdRol});
                     SqlParameter outputparameter = new SqlParameter("@IDIRECCION", SqlDbType.Int);
                     outputparameter.Direction = ParameterDirection.Output;
-                    cmd.Parameters.Add(outputparameter);
-                    await cmd.ExecuteNonQueryAsync();
+                     cmd.Parameters.Add(outputparameter);
+                   var resultado = await cmd.ExecuteNonQueryAsync();
+                    if (resultado == 1)
+                    {
+                        Debug.WriteLine("Ya Existe un Usuario con ese correo");
+                        return false;
+                    }
+                    else if(resultado == 2)
+                        return true;
                 }
                 await conexion.CloseDatabaseConnectionAsync();
                 return true;
@@ -175,7 +183,7 @@ namespace ApiAquamin.Models
 
             }
         }
-
+        //OBTENER USUARIOS
         public async Task<List<UsuarioDTO>> ObtenerUsuarios(int? id,string? nombre)
         {
             try
@@ -219,7 +227,7 @@ namespace ApiAquamin.Models
             }
 
         }
-
+        //ACTUALIZAR USUARIOS
         public async Task<bool> ActualizarDatosUsuario(int id,[FromBody] ActualizarUsuario usuario)
         {
             try
@@ -246,7 +254,7 @@ namespace ApiAquamin.Models
                     command.Parameters.Add(new SqlParameter("@NUMERO", usuario.Numero));
                     command.Parameters.Add(new SqlParameter("@IDCOMUNA", usuario.IdComuna));
                     command.Parameters.Add(new SqlParameter("@CORREO", usuario.Correo));
-                    command.Parameters.Add(new SqlParameter("@CONTRASENA", usuario.Contrasena));
+                    command.Parameters.Add(new SqlParameter("@CONTRASENA", encryptedpass));
                     command.Parameters.Add(new SqlParameter("@IDIRECCION", usuario.IDireccion));
                     command.Parameters.Add(new SqlParameter("@IDROL", usuario.IdRol));
                     await command.ExecuteNonQueryAsync();
@@ -259,7 +267,75 @@ namespace ApiAquamin.Models
                 Debug.WriteLine($"Error al actualizar los datos del usuario:{e.Message}");
                 return false;
             }
-        } 
+        }
+        //ELIMINAR USUARIOS
+        public async Task<bool> EliminarUsuario(int id)
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "ELIMINARUSUARIO";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@IDUSUARIO",id));
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                await conexion.CloseDatabaseConnectionAsync();
+                return true;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Hubo un error al eliminar el usuario:{e.Message}");
+                return false;
+            }
+        }
+        //LOGIN
+        public async Task<LoginDTO> IniciarSesion([FromBody] Login credenciales)
+        {
+            try
+            {
+                if(!string.IsNullOrEmpty(credenciales.Correo) && !string.IsNullOrEmpty(credenciales.contrasena))
+                {
+                    DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                    using(DbCommand cmd = connection.CreateCommand())
+                    {
+                        cmd.CommandText = "INICIARSESION";
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.Add(new SqlParameter("@CORREO",credenciales.Correo));
+                        LoginDTO usuario = new LoginDTO();
+                        using(var reader = await cmd.ExecuteReaderAsync())
+                        {
+                            while (await reader.ReadAsync())
+                            {
+                                usuario = new LoginDTO()
+                                {
+                                    IdUsuario = reader.GetInt32(reader.GetOrdinal("IDUSUARIO")),
+                                    NombreUsuario = reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
+                                    IdRol = reader.GetInt32(reader.GetOrdinal("IDROL")),
+                                    Contrasena = reader.GetString(reader.GetOrdinal("CONTRASENA")),
+                                };
+                            }
+                        }
+                        bool verificar = VerificarContrasena(credenciales.contrasena, usuario.Contrasena);
+                        if (verificar)
+                            return usuario;
+                        else
+                            Debug.WriteLine("La contraseña es incorrecta");
+                        return new LoginDTO();
+                    }
+                }
+                Debug.WriteLine("Debe ingresar un correo y una contraseña");
+                return new LoginDTO();
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al Iniciar Sesión:{e.Message}");
+                return new LoginDTO();
+            }
+        }
+
+        //ENCRIPTAR CONTRASEÑA
         private string EncriptarContrasena(string contrasena)
         {
             try
@@ -270,8 +346,57 @@ namespace ApiAquamin.Models
             }
             catch(Exception e)
             {
-                Debug.WriteLine($"Error al encriptar la contraseña_{e.Message}");
+                Debug.WriteLine($"Error al encriptar la contraseña:{e.Message}");
                 return "";
+            }
+        }
+        //VERIFICAR CONTRASEÑA
+        private Boolean VerificarContrasena(string passuser,string passbd)
+        {
+            try
+            {
+                bool verificar = BCrypt.Net.BCrypt.Verify(passuser, passbd);
+                return verificar;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al verificar las contraseñas:{e.Message}");
+                return false;
+            }
+        }
+
+       //METODOS PRODUCTOS
+       //INGRESAR PRODUCTOS
+       public async Task<bool> IngresarProducto(int idrol, [FromBody] IngresarProducto producto)
+        {
+            try
+            {
+                if (idrol == 1)
+                {
+                    DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                    using(DbCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = "INGRESARPRODUCTOS";
+                        command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.Add(new SqlParameter("@TIPO_PRODUCTO", producto.Tipo_Producto));
+                        command.Parameters.Add(new SqlParameter("@PRECIO",producto.Precio));
+                        command.Parameters.Add(new SqlParameter("@STOCK", producto.Stock));
+                        await command.ExecuteNonQueryAsync();
+                    }
+                    await conexion.CloseDatabaseConnectionAsync();
+                    return true;
+                }
+                else
+                {
+                    Debug.WriteLine($"Usted no está autorizado para ingresar un producto");
+                    return false;
+                }
+                    
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Hubo un error al ingresar un producto:{e.Message}");
+                return false;
             }
         }
 
