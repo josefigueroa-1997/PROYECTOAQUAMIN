@@ -250,7 +250,7 @@ namespace ApiAquamin.Models
                     .IsUnicode(false)
                     .HasColumnName("DETALLE");
 
-                entity.Property(e => e.EstadoPago)
+                entity.Property(e => e.Estado_Pago)
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("ESTADO_PAGO");
@@ -263,12 +263,12 @@ namespace ApiAquamin.Models
 
                 entity.Property(e => e.IdUsuario).HasColumnName("ID_USUARIO");
 
-                entity.Property(e => e.MetodoPago)
+                entity.Property(e => e.Metodo_Pago)
                     .HasMaxLength(60)
                     .IsUnicode(false)
                     .HasColumnName("METODO_PAGO");
 
-                entity.Property(e => e.TipoVenta)
+                entity.Property(e => e.Tipo_Venta)
                     .HasMaxLength(50)
                     .IsUnicode(false)
                     .HasColumnName("TIPO_VENTA");
@@ -276,6 +276,10 @@ namespace ApiAquamin.Models
                 entity.Property(e => e.Total)
                     .HasColumnType("decimal(10, 2)")
                     .HasColumnName("TOTAL");
+
+                entity.Property(e => e.Valor_Despacho)
+                    .HasColumnType("decimal(10,2)")
+                    .HasColumnName("VALOR_DESPACHO");
 
                 entity.HasOne(d => d.IdProductoNavigation)
                     .WithMany(p => p.VentaProductos)

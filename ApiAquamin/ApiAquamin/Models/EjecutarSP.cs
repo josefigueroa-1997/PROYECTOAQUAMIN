@@ -33,17 +33,15 @@ namespace ApiAquamin.Models
                 {
                     cmd.CommandText = "OBTENERSECTORES";
                     cmd.CommandType = CommandType.StoredProcedure;
-                    using (var reader = await cmd.ExecuteReaderAsync())
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
                     {
-                        while(await reader.ReadAsync())
+                        var sector = new Sector()
                         {
-                            var sector = new Sector()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("ID")),
-                                Nombre = reader.GetString(reader.GetOrdinal("NOMBRE")),
-                            };
-                            sectores.Add(sector);
-                        }
+                            Id = reader.GetInt32(reader.GetOrdinal("ID")),
+                            Nombre = reader.GetString(reader.GetOrdinal("NOMBRE")),
+                        };
+                        sectores.Add(sector);
                     }
                 }
                 await connection.CloseAsync();
@@ -67,19 +65,17 @@ namespace ApiAquamin.Models
                 {
                     cmd.CommandText = "OBTENERCOMUNAS";
                     cmd.CommandType = CommandType.StoredProcedure;
-                    using(var reader = await cmd.ExecuteReaderAsync())
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
                     {
-                        while(await reader.ReadAsync())
+                        var comunasdto = new ComunaDTO()
                         {
-                            var comunasdto = new ComunaDTO()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("ID")),
-                                Nombre = reader.GetString(reader.GetOrdinal("NOMBRE")),
-                                Idsector = reader.GetInt32(reader.GetOrdinal("IDSECTOR")),
-                                NombreSector = reader.GetString(reader.GetOrdinal("NOMBRESECTOR")),
-                            };
-                            comunas.Add(comunasdto);
-                        }
+                            Id = reader.GetInt32(reader.GetOrdinal("ID")),
+                            Nombre = reader.GetString(reader.GetOrdinal("NOMBRE")),
+                            Idsector = reader.GetInt32(reader.GetOrdinal("IDSECTOR")),
+                            NombreSector = reader.GetString(reader.GetOrdinal("NOMBRESECTOR")),
+                        };
+                        comunas.Add(comunasdto);
                     }
                 }
                 await conexion.CloseDatabaseConnectionAsync();
@@ -105,18 +101,16 @@ namespace ApiAquamin.Models
                 {
                     cmd.CommandText = "OBTENERROLES";
                     cmd.CommandType = CommandType.StoredProcedure;
-                    using(var reader = await cmd.ExecuteReaderAsync())
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while (await reader.ReadAsync())
                     {
-                        while(await reader.ReadAsync())
+                        var rol = new RolDTO()
                         {
-                            var rol = new RolDTO()
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("ID")),
-                                Nombre = reader.GetString(reader.GetOrdinal("NOMBRE")),
-                            };
+                            Id = reader.GetInt32(reader.GetOrdinal("ID")),
+                            Nombre = reader.GetString(reader.GetOrdinal("NOMBRE")),
+                        };
 
-                            roles.Add(rol);
-                        }
+                        roles.Add(rol);
                     }
                 }
                 await conexion.CloseDatabaseConnectionAsync();
@@ -160,9 +154,11 @@ namespace ApiAquamin.Models
                     cmd.Parameters.Add(new SqlParameter("@CORREO", SqlDbType.VarChar, 100) { Value = usuario.Correo });
                     cmd.Parameters.Add(new SqlParameter("@CONTRASENA", SqlDbType.NVarChar, -1) { Value = encryptedpass });
                     cmd.Parameters.Add(new SqlParameter("@IDROL", SqlDbType.Int) { Value = usuario.IdRol});
-                    SqlParameter outputparameter = new SqlParameter("@IDIRECCION", SqlDbType.Int);
-                    outputparameter.Direction = ParameterDirection.Output;
-                     cmd.Parameters.Add(outputparameter);
+                    SqlParameter outputparameter = new("@IDIRECCION", SqlDbType.Int)
+                    {
+                        Direction = ParameterDirection.Output
+                    };
+                    cmd.Parameters.Add(outputparameter);
                    var resultado = await cmd.ExecuteNonQueryAsync();
                     if (resultado == 1)
                     {
@@ -204,7 +200,7 @@ namespace ApiAquamin.Models
                     {
                         while(await reader.ReadAsync())
                         {
-                            UsuarioDTO usuario = new UsuarioDTO() {
+                            UsuarioDTO usuario = new() {
 
                                 Id = reader.GetInt32(reader.GetOrdinal("ID")),
                                 Nombre = reader.GetString(reader.GetOrdinal("NOMBRE")),
@@ -367,35 +363,275 @@ namespace ApiAquamin.Models
 
        //METODOS PRODUCTOS
        //INGRESAR PRODUCTOS
-       public async Task<bool> IngresarProducto(int idrol, [FromBody] IngresarProducto producto)
+       public async Task<bool> IngresarProducto([FromBody] IngresarProducto producto)
         {
             try
             {
-                if (idrol == 1)
-                {
+
                     DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
                     using(DbCommand command = connection.CreateCommand())
                     {
                         command.CommandText = "INGRESARPRODUCTOS";
                         command.CommandType = CommandType.StoredProcedure;
+                        command.Parameters.Add(new SqlParameter("@IDUSUARIO",producto.IdUsuario));
                         command.Parameters.Add(new SqlParameter("@TIPO_PRODUCTO", producto.Tipo_Producto));
                         command.Parameters.Add(new SqlParameter("@PRECIO",producto.Precio));
                         command.Parameters.Add(new SqlParameter("@STOCK", producto.Stock));
-                        await command.ExecuteNonQueryAsync();
-                    }
-                    await conexion.CloseDatabaseConnectionAsync();
-                    return true;
-                }
-                else
-                {
-                    Debug.WriteLine($"Usted no está autorizado para ingresar un producto");
-                    return false;
-                }
+                        var resultado = await command.ExecuteScalarAsync();
+                        if (Convert.ToInt32(resultado) == 0)
+                        {
+                            return true;
+                        }
+                        else {
+                            Debug.WriteLine($"Usted no está autorizado para ingresar un producto");
+                             return false;
+                        }
+                           
+
+                    }       
+                
                     
             }
             catch(Exception e)
             {
                 Debug.WriteLine($"Hubo un error al ingresar un producto:{e.Message}");
+                return false;
+            }
+        }
+
+        //BUSCAR PRODUCTOS
+        public async Task<List<ProductoDTO>> BuscarProductos(int? id,string? nombre)
+        {
+            try
+            {
+                var productos = new List<ProductoDTO>();
+                #pragma warning disable CS8600
+                object idproducto = (object)id ?? DBNull.Value;
+                object nombreproducto = (object)nombre ?? DBNull.Value;
+                #pragma warning restore CS8600          
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "BUSCARPRODUCTO";
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.Add(new SqlParameter("@IDPRODUCTO",idproducto));
+                    command.Parameters.Add(new SqlParameter("@TIPO_PRODUCTO",nombreproducto));
+                    using var reader = await command.ExecuteReaderAsync();
+                    while(await reader.ReadAsync())
+                    {
+                        var producto = new ProductoDTO()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("ID")),
+                            Tipo_Producto = reader.GetString(reader.GetOrdinal("TIPO_PRODUCTO")),
+                            Precio = reader.GetDecimal(reader.GetOrdinal("PRECIO")),
+                            Stock = reader.GetInt32(reader.GetOrdinal("STOCK")),
+                        };
+                        productos.Add(producto);
+                    }
+                }
+                return productos;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al buscar un producto:{e.Message}");
+                return new List<ProductoDTO>();
+            }
+        }
+        //ACTUALIZAR  PRODUCTO
+        public async Task<bool> ActualizarProducto(int id, [FromBody] IngresarProducto producto)
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand command = connection.CreateCommand())
+                {
+                    command.CommandText = "ACTUALIZARPRODUCTO";
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.Add(new SqlParameter("@IDPRODUCTO", id));
+                    command.Parameters.Add(new SqlParameter("@IDUSUARIO", producto.IdUsuario));
+                    command.Parameters.Add(new SqlParameter("@TIPO_PRODUCTO", producto.Tipo_Producto));
+                    command.Parameters.Add(new SqlParameter("@PRECIO", producto.Precio));
+                    command.Parameters.Add(new SqlParameter("@STOCK", producto.Stock));
+                    var resultado = await command.ExecuteScalarAsync();
+                    if (Convert.ToInt32(resultado) == 0)
+                        return true;
+                    else
+                    {
+                        Debug.WriteLine("Usted no está autorizado, para realizar estos cambios al producto");
+                    }
+                }
+                await conexion.CloseDatabaseConnectionAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"Error al actualizar el prducto:{e.Message}");
+                return false;
+            }
+        }
+        //ELIMINAR PRODUCTO
+        public async Task<bool> EliminarProducto(int idproducto, [FromBody] EliminarProducto producto)
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "ELIMINARPRODUCTO";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@IDPRODUCTO", idproducto));
+                    cmd.Parameters.Add(new SqlParameter("@IDUSUARIO", producto.IdUsuario));
+                    var resultado = await cmd.ExecuteScalarAsync();
+                    if (Convert.ToInt32(resultado) == 0)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Usted no está autorizado, para eliminar este producto");
+                        return false;
+                    }
+                }
+                
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al eliminar el producto:{e.Message}");
+                return false;
+            }
+        
+        }
+
+        //METODOS VENTA PRODUCTO
+        //INGRESAR VENTA
+
+        public async Task<bool> IngrsarVenta([FromBody] Venta venta)
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "INGRESARVENTA";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@IDUSUARIO",venta.IdUsuario));
+                    cmd.Parameters.Add(new SqlParameter("@IDPRODUCTO", venta.IdProducto));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO_PAGO", venta.Estado_Pago));
+                    cmd.Parameters.Add(new SqlParameter("@METODO_PAGO", venta.Metodo_Pago));
+                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD", venta.Cantidad));
+                    cmd.Parameters.Add(new SqlParameter("@FECHA", venta.Fecha));
+                    cmd.Parameters.Add(new SqlParameter("@TOTAL", venta.Total));
+                    cmd.Parameters.Add(new SqlParameter("@TIPO_VENTA", venta.Tipo_Venta));
+                    cmd.Parameters.Add(new SqlParameter("@VALOR_DESPACHO", venta.Valor_Despacho));
+                    cmd.Parameters.Add(new SqlParameter("@DETALLE", venta.Detalle));
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                await conexion.CloseDatabaseConnectionAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"Hubo un error al ingresar una venta:{e.Message}");
+                return false;
+            }
+        }
+
+        //OBTENERVENTA
+        public async Task<List<VentaDTO>> ObtenerVentas(int? idventa,string? tipoventa)
+        {
+            try
+            {
+                var ventas = new List<VentaDTO>();
+                #pragma warning disable CS8600
+                object idparameter = (object)idventa ?? DBNull.Value;
+                object tipoventaparameter = (object)tipoventa ?? DBNull.Value;
+                #pragma warning restore CS8600
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "OBTENERVENTA";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@IDVENTA",idparameter));
+                    cmd.Parameters.Add(new SqlParameter("@TIPOVENTA", tipoventaparameter));
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while(await reader.ReadAsync())
+                    {
+                        var venta = new VentaDTO()
+                        {
+                            Id = reader.GetInt32(reader.GetOrdinal("ID")),
+                            Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")),
+                            NombreUsuario = reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
+                            veinteLTS = reader.GetInt32(reader.GetOrdinal("veinteLTS")),    
+                            diezLTS = reader.GetInt32(reader.GetOrdinal("diezLTS")),
+                            Detalle = reader.GetString(reader.GetOrdinal("DETALLE")),
+                            Metodo_Pago = reader.GetString(reader.GetOrdinal("METODO_PAGO")),
+                            Estado_Pago = reader.GetString(reader.GetOrdinal("ESTADO_PAGO")),
+                            Total = reader.GetDecimal(reader.GetOrdinal("TOTAL")),
+                        };
+                        ventas.Add(venta);
+                    }
+                }
+                return ventas;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"Error al obtener los registros de venta:{e.Message}");
+                return new List<VentaDTO>();
+            }
+        }
+
+        //ACTUALIZAR DATOS VENTAS
+        public async Task<bool> ActualizarDatosVenta(int id, [FromBody] Venta venta)
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using (DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "ACTUALIZARDATOSVENTA";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@IDVENTA",id));
+                    cmd.Parameters.Add(new SqlParameter("@IDUSUARIO", venta.IdUsuario));
+                    cmd.Parameters.Add(new SqlParameter("@IDPRODUCTO", venta.IdProducto));
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO_PAGO", venta.Estado_Pago));
+                    cmd.Parameters.Add(new SqlParameter("@METODO_PAGO", venta.Metodo_Pago));
+                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD", venta.Cantidad));
+                    cmd.Parameters.Add(new SqlParameter("@FECHA", venta.Fecha));
+                    cmd.Parameters.Add(new SqlParameter("@TOTAL", venta.Total));
+                    cmd.Parameters.Add(new SqlParameter("@TIPO_VENTA", venta.Tipo_Venta));
+                    cmd.Parameters.Add(new SqlParameter("@VALOR_DESPACHO", venta.Valor_Despacho));
+                    cmd.Parameters.Add(new SqlParameter("@DETALLE", venta.Detalle));
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                await conexion.CloseDatabaseConnectionAsync();
+                return true;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"Hubo un error al ingresar una venta:{e.Message}");
+                return false;
+            }
+        }
+
+        //ELIMINAR VENTA
+        public async Task<bool> EliminarVenta(int id)
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "DELETEVENTA";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@IDVENTA",id));
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                await conexion.CloseDatabaseConnectionAsync();
+                return true;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al eliminar la venta:{e.Message}");
                 return false;
             }
         }

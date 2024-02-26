@@ -43,6 +43,7 @@ public class Startup
         services.AddScoped<RolService>();
         services.AddScoped<UsuarioService>();
         services.AddScoped<ProductoService>();
+        services.AddScoped<VentaService>();
         services.AddScoped<EjecutarSP>();
         services.AddScoped<Conexion>();
     }
