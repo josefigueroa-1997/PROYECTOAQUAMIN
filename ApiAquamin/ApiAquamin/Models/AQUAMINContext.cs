@@ -22,7 +22,7 @@ namespace ApiAquamin.Models
         public virtual DbSet<Producto> Productos { get; set; } = null!;
         public virtual DbSet<Rol> Rols { get; set; } = null!;
         public virtual DbSet<RutaDespacho> RutaDespachos { get; set; } = null!;
-        public virtual DbSet<Rutum> Ruta { get; set; } = null!;
+    
         public virtual DbSet<Sector> Sectors { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
         public virtual DbSet<VentaProducto> VentaProductos { get; set; } = null!;
@@ -150,21 +150,18 @@ namespace ApiAquamin.Models
                     .IsUnicode(false)
                     .HasColumnName("COMENTARIO");
 
-                entity.Property(e => e.Fecha)
-                    .HasColumnType("datetime")
-                    .HasColumnName("FECHA");
+                entity.Property(e => e.Estado)
+                     .HasMaxLength(20)
+                     .IsUnicode(false)
+                     .HasColumnName("ESTADO");
 
                 entity.Property(e => e.Foto).HasColumnName("FOTO");
 
-                entity.Property(e => e.IdRuta).HasColumnName("ID_RUTA");
+                
 
                 entity.Property(e => e.IdVenta).HasColumnName("ID_VENTA");
 
-                entity.HasOne(d => d.IdRutaNavigation)
-                    .WithMany(p => p.RutaDespachos)
-                    .HasForeignKey(d => d.IdRuta)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("ID_RUTA_FK");
+                
 
                 entity.HasOne(d => d.IdVentaNavigation)
                     .WithMany(p => p.RutaDespachos)
@@ -173,17 +170,7 @@ namespace ApiAquamin.Models
                     .HasConstraintName("ID_VENTA_FK");
             });
 
-            modelBuilder.Entity<Rutum>(entity =>
-            {
-                entity.ToTable("RUTA");
-
-                entity.Property(e => e.Id).HasColumnName("ID");
-
-                entity.Property(e => e.Tiporuta)
-                    .HasMaxLength(40)
-                    .IsUnicode(false)
-                    .HasColumnName("TIPORUTA");
-            });
+            
 
             modelBuilder.Entity<Sector>(entity =>
             {
@@ -244,6 +231,7 @@ namespace ApiAquamin.Models
                 entity.Property(e => e.Id).HasColumnName("ID");
 
                 entity.Property(e => e.Cantidad).HasColumnName("CANTIDAD");
+                entity.Property(e => e.Prioridad).HasColumnName("PRIORIDAD");
 
                 entity.Property(e => e.Detalle)
                     .HasMaxLength(200)
@@ -255,8 +243,10 @@ namespace ApiAquamin.Models
                     .IsUnicode(false)
                     .HasColumnName("ESTADO_PAGO");
 
+                
+
                 entity.Property(e => e.Fecha)
-                    .HasColumnType("datetime")
+                    .HasColumnType("date")
                     .HasColumnName("FECHA");
 
                 entity.Property(e => e.IdProducto).HasColumnName("ID_PRODUCTO");

@@ -11,6 +11,8 @@ using ApiAquamin.Models.Formularios;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using BCrypt.Net;
+using System.Runtime.CompilerServices;
+
 namespace ApiAquamin.Models
 {
     public class EjecutarSP
@@ -124,6 +126,7 @@ namespace ApiAquamin.Models
             
 
         }
+        
         //AQUI COMIENZAN LOS METODOS DE USUARIO
         //REGISTRAR USUARIO
         public async Task<bool> RegistrarUsuario([FromBody] CrearUsuario usuario)
@@ -518,16 +521,28 @@ namespace ApiAquamin.Models
                     cmd.Parameters.Add(new SqlParameter("@IDPRODUCTO", venta.IdProducto));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO_PAGO", venta.Estado_Pago));
                     cmd.Parameters.Add(new SqlParameter("@METODO_PAGO", venta.Metodo_Pago));
-                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD", venta.Cantidad));
                     cmd.Parameters.Add(new SqlParameter("@FECHA", venta.Fecha));
                     cmd.Parameters.Add(new SqlParameter("@TOTAL", venta.Total));
                     cmd.Parameters.Add(new SqlParameter("@TIPO_VENTA", venta.Tipo_Venta));
                     cmd.Parameters.Add(new SqlParameter("@VALOR_DESPACHO", venta.Valor_Despacho));
                     cmd.Parameters.Add(new SqlParameter("@DETALLE", venta.Detalle));
-                    await cmd.ExecuteNonQueryAsync();
+                    cmd.Parameters.Add(new SqlParameter("@PRIORIDAD", venta.Prioridad));
+                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_20LTS", venta.Cantidad_20LTS));
+                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_10LTS", venta.Cantidad_10LTS));
+                    cmd.Parameters.Add(new SqlParameter("@EXTRA", venta.Extra));
+                    var resultado = await cmd.ExecuteScalarAsync();
+                    if(Convert.ToInt32(resultado) == 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("Debe ingresar un tipo de prioridad de venta");
+                        return false;
+                    }
+                    
                 }
-                await conexion.CloseDatabaseConnectionAsync();
-                return true;
+                
             }
             catch (Exception e)
             {
@@ -595,12 +610,15 @@ namespace ApiAquamin.Models
                     cmd.Parameters.Add(new SqlParameter("@IDPRODUCTO", venta.IdProducto));
                     cmd.Parameters.Add(new SqlParameter("@ESTADO_PAGO", venta.Estado_Pago));
                     cmd.Parameters.Add(new SqlParameter("@METODO_PAGO", venta.Metodo_Pago));
-                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD", venta.Cantidad));
                     cmd.Parameters.Add(new SqlParameter("@FECHA", venta.Fecha));
                     cmd.Parameters.Add(new SqlParameter("@TOTAL", venta.Total));
                     cmd.Parameters.Add(new SqlParameter("@TIPO_VENTA", venta.Tipo_Venta));
                     cmd.Parameters.Add(new SqlParameter("@VALOR_DESPACHO", venta.Valor_Despacho));
                     cmd.Parameters.Add(new SqlParameter("@DETALLE", venta.Detalle));
+                    cmd.Parameters.Add(new SqlParameter("@PRIORIDAD", venta.Prioridad));
+                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_20LTS", venta.Cantidad_20LTS));
+                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_10LTS", venta.Cantidad_10LTS));
+                    cmd.Parameters.Add(new SqlParameter("@EXTRA", venta.Extra));
                     await cmd.ExecuteNonQueryAsync();
                 }
                 await conexion.CloseDatabaseConnectionAsync();
@@ -635,6 +653,73 @@ namespace ApiAquamin.Models
                 return false;
             }
         }
+
+        //METODOS RUTADESPACHO
+        public async Task<bool> IngresarRutaDespacho()
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "INRESARRUTADESPACHO";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                await conexion.CloseDatabaseConnectionAsync();
+                return true;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al ingresar la venta en la ruta de despacho:{e.Message}");
+                return false;
+            }
+        }
+        //DESPLEGARRUTA
+        public async Task<List<RutaDTO>> DesplegarRuta(int id)
+        {
+            try
+            {
+                var rutas = new List<RutaDTO>();
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using( DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "GENERARRUTA";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@IDSECTOR",id));
+                    using var reader = await cmd.ExecuteReaderAsync();
+                    while(await reader.ReadAsync())
+                    {
+                        var ruta = new RutaDTO()
+                        {
+                            IdVenta = reader.IsDBNull(reader.GetOrdinal("IDVENTA")) ? 0 : reader.GetInt32(reader.GetOrdinal("IDVENTA")),
+                            NombreUsuario = reader.IsDBNull(reader.GetOrdinal("NOMBREUSUARIO")) ? "" : reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
+                            veinteLTs = reader.IsDBNull(reader.GetOrdinal("veinteLTS")) ? 0 : reader.GetInt32(reader.GetOrdinal("veinteLTS")),
+                            diezLTs = reader.IsDBNull(reader.GetOrdinal("diezLTS")) ? 0 : reader.GetInt32(reader.GetOrdinal("diezLTS")),
+                            extra = reader.IsDBNull(reader.GetOrdinal("EXTRA")) ? 0 : reader.GetInt32(reader.GetOrdinal("EXTRA")),
+                            Detalle = reader.IsDBNull(reader.GetOrdinal("DETALLE")) ? "" : reader.GetString(reader.GetOrdinal("DETALLE")),
+                            Telefono = reader.IsDBNull(reader.GetOrdinal("TELEFONO")) ? "" : reader.GetString(reader.GetOrdinal("TELEFONO")),
+                            Calle = reader.IsDBNull(reader.GetOrdinal("CALLE")) ? "" : reader.GetString(reader.GetOrdinal("CALLE")),
+                            Numero = reader.IsDBNull(reader.GetOrdinal("NUMERO")) ? 0 : reader.GetInt32(reader.GetOrdinal("NUMERO")),
+                            Comuna = reader.IsDBNull(reader.GetOrdinal("COMUNA")) ? "" : reader.GetString(reader.GetOrdinal("COMUNA")),
+                            Metodo_Pago = reader.IsDBNull(reader.GetOrdinal("METODO_PAGO")) ? "" : reader.GetString(reader.GetOrdinal("METODO_PAGO")),
+                            Total = reader.IsDBNull(reader.GetOrdinal("TOTAL")) ? 0 : reader.GetDecimal(reader.GetOrdinal("TOTAL")),
+                            EstadoEntrega = reader.IsDBNull(reader.GetOrdinal("ESTADOENTREGA")) ? "" : reader.GetString(reader.GetOrdinal("ESTADOENTREGA")),
+                            Comentario = reader.IsDBNull(reader.GetOrdinal("COMENTARIO")) ? "" : reader.GetString(reader.GetOrdinal("COMENTARIO")),
+                            Foto = reader.IsDBNull(reader.GetOrdinal("FOTO")) ? null : new byte[] { reader.GetByte(reader.GetOrdinal("FOTO")) }
+                        };
+                        rutas.Add(ruta);
+                    }
+                }
+                return rutas;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine($"Error al desplegar la ruta:{e.Message}");
+                return new List<RutaDTO>();
+            }
+        }
+
 
     }
 }

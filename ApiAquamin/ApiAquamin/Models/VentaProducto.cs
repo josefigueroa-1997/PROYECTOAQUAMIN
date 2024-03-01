@@ -22,7 +22,7 @@ namespace ApiAquamin.Models
         public decimal Total { get; set; }
         public string Tipo_Venta { get; set; } = null!;
         public decimal Valor_Despacho { get; set; }
-
+        public int? Prioridad { get; set; }
         public virtual Producto IdProductoNavigation { get; set; } = null!;
         public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
         public virtual ICollection<Boletum> Boleta { get; set; }

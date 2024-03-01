@@ -44,6 +44,7 @@ public class Startup
         services.AddScoped<UsuarioService>();
         services.AddScoped<ProductoService>();
         services.AddScoped<VentaService>();
+        services.AddScoped<RutaDespachoService>();
         services.AddScoped<EjecutarSP>();
         services.AddScoped<Conexion>();
     }
