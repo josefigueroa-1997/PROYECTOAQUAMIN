@@ -522,16 +522,23 @@ namespace ApiAquamin.Models
                     cmd.Parameters.Add(new SqlParameter("@ESTADO_PAGO", venta.Estado_Pago));
                     cmd.Parameters.Add(new SqlParameter("@METODO_PAGO", venta.Metodo_Pago));
                     cmd.Parameters.Add(new SqlParameter("@FECHA", venta.Fecha));
-                    cmd.Parameters.Add(new SqlParameter("@TOTAL", venta.Total));
+                    
                     cmd.Parameters.Add(new SqlParameter("@TIPO_VENTA", venta.Tipo_Venta));
-                    cmd.Parameters.Add(new SqlParameter("@VALOR_DESPACHO", venta.Valor_Despacho));
+                    
                     cmd.Parameters.Add(new SqlParameter("@DETALLE", venta.Detalle));
                     cmd.Parameters.Add(new SqlParameter("@PRIORIDAD", venta.Prioridad));
-                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_20LTS", venta.Cantidad_20LTS));
-                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_10LTS", venta.Cantidad_10LTS));
-                    cmd.Parameters.Add(new SqlParameter("@EXTRA", venta.Extra));
-                    var resultado = await cmd.ExecuteScalarAsync();
-                    if(Convert.ToInt32(resultado) == 1)
+                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD", venta.Cantidad));
+
+                    var resultadoParam = new SqlParameter("@RESULTADO", SqlDbType.Int);
+                    resultadoParam.Direction = ParameterDirection.Output;
+                    cmd.Parameters.Add(resultadoParam);
+
+                    await cmd.ExecuteNonQueryAsync();
+
+                    
+                    int resultado = Convert.ToInt32(resultadoParam.Value);
+
+                    if (resultado == 1)
                     {
                         return true;
                     }
@@ -573,7 +580,7 @@ namespace ApiAquamin.Models
                     {
                         var venta = new VentaDTO()
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("ID")),
+                            
                             Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")),
                             NombreUsuario = reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
                             veinteLTS = reader.GetInt32(reader.GetOrdinal("veinteLTS")),    
@@ -616,9 +623,8 @@ namespace ApiAquamin.Models
                     cmd.Parameters.Add(new SqlParameter("@VALOR_DESPACHO", venta.Valor_Despacho));
                     cmd.Parameters.Add(new SqlParameter("@DETALLE", venta.Detalle));
                     cmd.Parameters.Add(new SqlParameter("@PRIORIDAD", venta.Prioridad));
-                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_20LTS", venta.Cantidad_20LTS));
-                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_10LTS", venta.Cantidad_10LTS));
-                    cmd.Parameters.Add(new SqlParameter("@EXTRA", venta.Extra));
+                    cmd.Parameters.Add(new SqlParameter("@CANTIDAD_20LTS", venta.Cantidad));
+                    
                     await cmd.ExecuteNonQueryAsync();
                 }
                 await conexion.CloseDatabaseConnectionAsync();
@@ -719,7 +725,53 @@ namespace ApiAquamin.Models
                 return new List<RutaDTO>();
             }
         }
-
+        //ACTUALIZARRUTA
+        public async Task<bool> ActualizarRuta(int id,[FromBody] Ruta ruta)
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                
+                using (DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "ACTUALIZARPRODUCTORUTA";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@ID",id));
+                    cmd.Parameters.Add(new SqlParameter("@COMENTARIO", ruta.Comentario));
+                   
+                    cmd.Parameters.Add(new SqlParameter("@ESTADO", ruta.Estado));
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                await conexion.CloseDatabaseConnectionAsync();
+                return true;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al actualizar los datos de la ruta:{e.Message}");
+                return false;
+            }
+        }
+        public async Task<bool> EliminarRuta(int id)
+        {
+            try
+            {
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "ELIMINARVENTARUTA";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@ID",id));
+                    await cmd.ExecuteNonQueryAsync();
+                }
+                await conexion.CloseDatabaseConnectionAsync();
+                return true;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al eliminar una venta de ruta:{e.Message}");
+                return false;
+            }
+        }
 
     }
 }

@@ -13,8 +13,7 @@
         public string Tipo_Venta { get; set; } = null!;
         public decimal Valor_Despacho { get; set; }
         public int? Prioridad { get; set; }
-        public int Cantidad_20LTS { get; set; }
-        public int Cantidad_10LTS { get; set; }
-        public int Extra { get; set; }
+        public int Cantidad { get; set; }
+        
     }
 }

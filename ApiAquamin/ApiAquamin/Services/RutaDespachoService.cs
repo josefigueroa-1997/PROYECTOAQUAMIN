@@ -1,6 +1,8 @@
 ﻿using ApiAquamin.DTO;
+using ApiAquamin.Models.Formularios;
 using ApiAquamin.Models;
 using ApiAquamin.Services.Interface;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ApiAquamin.Services
 {
@@ -37,6 +39,36 @@ namespace ApiAquamin.Services
             catch
             {
                 return new List<RutaDTO>();
+            }
+        }
+        public async Task<bool> ActualizarRuta(int id, [FromBody] Ruta ruta)
+        {
+            try
+            {
+                bool actualizar = await ejecutarSP.ActualizarRuta(id, ruta);
+                if (actualizar)
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        public async Task<bool> EliminarRuta(int id)
+        {
+            try
+            {
+                bool eliminar = await ejecutarSP.EliminarRuta(id);
+                if (eliminar)
+                    return true;
+                else
+                    return false;
+            }
+            catch
+            {
+                return false;
             }
         }
     }

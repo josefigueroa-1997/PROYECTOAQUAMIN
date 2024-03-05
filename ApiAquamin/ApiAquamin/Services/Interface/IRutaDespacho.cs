@@ -1,4 +1,6 @@
 ﻿using ApiAquamin.DTO;
+using ApiAquamin.Models.Formularios;
+using Microsoft.AspNetCore.Mvc;
 
 namespace ApiAquamin.Services.Interface
 {
@@ -6,6 +8,8 @@ namespace ApiAquamin.Services.Interface
     {
         public Task<bool> IngresarRuta();
         public Task<List<RutaDTO>> DesplegarRuta(int id);
+        public Task<bool> ActualizarRuta(int id, [FromBody] Ruta ruta);
+        public Task<bool> EliminarRuta(int id);
         
     }
 }
