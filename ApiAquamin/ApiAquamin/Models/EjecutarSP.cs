@@ -559,7 +559,7 @@ namespace ApiAquamin.Models
         }
 
         //OBTENERVENTA
-        public async Task<List<VentaDTO>> ObtenerVentas(int? idventa,string? tipoventa)
+        public async Task<List<VentaDTO>> ObtenerVentas(int? idventa,string? tipoventa,DateTime? fecha,int? idsector)
         {
             try
             {
@@ -567,6 +567,8 @@ namespace ApiAquamin.Models
                 #pragma warning disable CS8600
                 object idparameter = (object)idventa ?? DBNull.Value;
                 object tipoventaparameter = (object)tipoventa ?? DBNull.Value;
+                object fechaparameter = (object)fecha ?? DBNull.Value;
+                object sectorparameter = (object)idsector ?? DBNull.Value;
                 #pragma warning restore CS8600
                 DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
                 using(DbCommand cmd = connection.CreateCommand())
@@ -575,12 +577,14 @@ namespace ApiAquamin.Models
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(new SqlParameter("@IDVENTA",idparameter));
                     cmd.Parameters.Add(new SqlParameter("@TIPOVENTA", tipoventaparameter));
+                    cmd.Parameters.Add(new SqlParameter("@FECHA", fechaparameter));
+                    cmd.Parameters.Add(new SqlParameter("@SECTOR",sectorparameter));
                     using var reader = await cmd.ExecuteReaderAsync();
                     while(await reader.ReadAsync())
                     {
                         var venta = new VentaDTO()
                         {
-                            
+                            NumeroVenta = reader.GetInt32(reader.GetOrdinal("NumeroVenta")),
                             Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")),
                             NombreUsuario = reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
                             veinteLTS = reader.GetInt32(reader.GetOrdinal("veinteLTS")),    
@@ -588,6 +592,7 @@ namespace ApiAquamin.Models
                             Detalle = reader.GetString(reader.GetOrdinal("DETALLE")),
                             Metodo_Pago = reader.GetString(reader.GetOrdinal("METODO_PAGO")),
                             Estado_Pago = reader.GetString(reader.GetOrdinal("ESTADO_PAGO")),
+                            Comuna = reader.GetString(reader.GetOrdinal("COMUNA")),
                             Total = reader.GetDecimal(reader.GetOrdinal("TOTAL")),
                         };
                         ventas.Add(venta);
@@ -599,6 +604,48 @@ namespace ApiAquamin.Models
             {
                 Debug.WriteLine($"Error al obtener los registros de venta:{e.Message}");
                 return new List<VentaDTO>();
+            }
+        }
+
+        //HISTORIAL VENTAS CLIENTES
+        public async Task<List<HistorialClienteDTO>> HistorialProductoCliente(int idusuario,DateTime fecha)
+        {
+            try
+            {
+                var historialcliente = new List<HistorialClienteDTO>();
+                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
+                using(DbCommand cmd = connection.CreateCommand())
+                {
+                    cmd.CommandText = "HISTORIALPRODCTOCLIENTE";
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add(new SqlParameter("@IDUSUARIO",idusuario));
+                    cmd.Parameters.Add(new SqlParameter("@FECHA",fecha));
+                    var reader = await cmd.ExecuteReaderAsync();
+                    while(await reader.ReadAsync())
+                    {
+                        var historial = new HistorialClienteDTO()
+                        {
+                            IDVENTA = reader.GetInt32(reader.GetOrdinal("IDVENTA")),
+                            FECHA = reader.GetDateTime(reader.GetOrdinal("FECHA")),
+                            NombreUsuario = reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
+                            ID_PRODUCTO = reader.GetInt32(reader.GetOrdinal("ID_PRODUCTO")),
+                            TIPO_PRODUCTO = reader.GetString(reader.GetOrdinal("TIPO_PRODUCTO")),
+                            PRECIOUNITARIO = reader.GetDecimal(reader.GetOrdinal("PRECIOUNITARIO")),
+                            CANTIDAD = reader.GetInt32(reader.GetOrdinal("CANTIDAD")),
+                            DETALLE = reader.GetString(reader.GetOrdinal("DETALLE")),
+                            ESTADO_PAGO = reader.GetString(reader.GetOrdinal("ESTADO_PAGO")),
+                            METODO_PAGO = reader.GetString(reader.GetOrdinal("METODO_PAGO")),
+                            TOTAL = reader.GetDecimal(reader.GetOrdinal("TOTAL")),
+                        };
+                        historialcliente.Add(historial);
+                    }
+                }
+                return historialcliente;
+            }
+            catch(Exception e)
+            {
+                Debug.WriteLine($"Error al obtener el historial del cliente:{e.Message}");
+                return new List<HistorialClienteDTO>();
             }
         }
 
@@ -698,11 +745,11 @@ namespace ApiAquamin.Models
                     {
                         var ruta = new RutaDTO()
                         {
-                            IdVenta = reader.IsDBNull(reader.GetOrdinal("IDVENTA")) ? 0 : reader.GetInt32(reader.GetOrdinal("IDVENTA")),
+                            NumeroDespacho = reader.IsDBNull(reader.GetOrdinal("NumeroDespacho")) ? 0 : reader.GetInt32(reader.GetOrdinal("NumeroDespacho")),
+                            Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")),
                             NombreUsuario = reader.IsDBNull(reader.GetOrdinal("NOMBREUSUARIO")) ? "" : reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
-                            veinteLTs = reader.IsDBNull(reader.GetOrdinal("veinteLTS")) ? 0 : reader.GetInt32(reader.GetOrdinal("veinteLTS")),
-                            diezLTs = reader.IsDBNull(reader.GetOrdinal("diezLTS")) ? 0 : reader.GetInt32(reader.GetOrdinal("diezLTS")),
-                            extra = reader.IsDBNull(reader.GetOrdinal("EXTRA")) ? 0 : reader.GetInt32(reader.GetOrdinal("EXTRA")),
+                            VEINTELTS = reader.IsDBNull(reader.GetOrdinal("VEINTELTS")) ? 0 : reader.GetInt32(reader.GetOrdinal("VEINTELTS")),
+                            DIEZLTS = reader.IsDBNull(reader.GetOrdinal("DIEZLTS")) ? 0 : reader.GetInt32(reader.GetOrdinal("DIEZLTS")),
                             Detalle = reader.IsDBNull(reader.GetOrdinal("DETALLE")) ? "" : reader.GetString(reader.GetOrdinal("DETALLE")),
                             Telefono = reader.IsDBNull(reader.GetOrdinal("TELEFONO")) ? "" : reader.GetString(reader.GetOrdinal("TELEFONO")),
                             Calle = reader.IsDBNull(reader.GetOrdinal("CALLE")) ? "" : reader.GetString(reader.GetOrdinal("CALLE")),

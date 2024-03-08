@@ -2,11 +2,11 @@
 {
     public class RutaDTO
     {
-        public int IdVenta{ get; set; }
+        public int NumeroDespacho{ get; set; }
+        public DateTime Fecha { get; set; }
         public string NombreUsuario { get; set; } = null!;
-        public int veinteLTs { get; set; }
-        public int diezLTs { get; set; }
-        public int extra { get; set; }
+        public int VEINTELTS { get; set; }
+        public int DIEZLTS { get; set; }
         public string Detalle { get; set; } = null!;
         public string Telefono { get; set; } = null!;
         public string Calle { get; set; } = null!;

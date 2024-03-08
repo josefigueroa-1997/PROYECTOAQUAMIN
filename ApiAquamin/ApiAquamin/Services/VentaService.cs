@@ -29,9 +29,9 @@ namespace ApiAquamin.Services
                 return false;
             }
         }
-        public async Task<List<VentaDTO>> ObtenerVenta(int? id, string? tipoventa)
+        public async Task<List<VentaDTO>> ObtenerVenta(int? id, string? tipoventa, DateTime? fecha, int? idsector)
         {
-            var venta = await ejecutarSP.ObtenerVentas(id, tipoventa);
+            var venta = await ejecutarSP.ObtenerVentas(id, tipoventa,fecha,idsector);
             return venta;
         }
         public async Task<bool> ActualizarDatosVenta(int id, [FromBody] Venta venta)
@@ -47,6 +47,18 @@ namespace ApiAquamin.Services
             catch 
             {
                 return false;
+            }
+        }
+        public async Task<List<HistorialClienteDTO>> HistorialProductoCliente(int idusuario, DateTime fecha)
+        {
+            try
+            {
+                var historial = await ejecutarSP.HistorialProductoCliente(idusuario, fecha);
+                return historial;
+            }
+            catch
+            {
+                return new List<HistorialClienteDTO>();
             }
         }
         public async Task<bool> EliminarVenta(int id)

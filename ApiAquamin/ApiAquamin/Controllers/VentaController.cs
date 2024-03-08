@@ -26,11 +26,28 @@ namespace ApiAquamin.Controllers
         }
         [HttpGet]
         [Route("GetVentas")]
-        public async Task<IActionResult> GetVentas([FromQuery] int? id, [FromQuery] string? tipoventa)
+        public async Task<IActionResult> GetVentas([FromQuery] int? id, [FromQuery] string? tipoventa, [FromQuery] DateTime? fecha, [FromQuery] int? idsector)
         {
-            var resultado = await ventaService.ObtenerVenta(id, tipoventa);
+            var resultado = await ventaService.ObtenerVenta(id, tipoventa,fecha,idsector);
             return Ok(resultado);
         }
+
+        [HttpGet]
+        [Route("GetHistorialCliente")]
+        public async Task<IActionResult> GetHistorialCliente([FromQuery] int idusuario, [FromQuery] DateTime fecha)
+        {
+            try
+            {
+                var historial = await ventaService.HistorialProductoCliente(idusuario, fecha);
+                return Ok(historial);
+            }
+            catch (Exception e)
+            {
+                return BadRequest(e.Message);
+            }
+            
+        }
+
         [HttpPut]
         [Route("UpdateVenta/{id}")]
         public async Task<IActionResult> UpdateVenta(int id, [FromBody] Venta venta)
