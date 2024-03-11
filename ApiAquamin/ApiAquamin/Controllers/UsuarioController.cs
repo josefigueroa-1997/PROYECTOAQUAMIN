@@ -2,9 +2,11 @@
 using ApiAquamin.Services;
 using ApiAquamin.Models.Formularios;
 using ApiAquamin.DTO;
+using Microsoft.AspNetCore.Cors;
 
 namespace ApiAquamin.Controllers
 {
+   
     [ApiController]
     [Route("Usuario")]
     public class UsuarioController : ControllerBase

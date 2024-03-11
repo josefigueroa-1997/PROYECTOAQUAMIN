@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ApiAquamin.Services;
 using System.Diagnostics;
-
+using Microsoft.AspNetCore.Cors;
 namespace ApiAquamin.Controllers
 {
+    
     [ApiController]
     [Route("Comuna")]
     public class ComunaController : ControllerBase

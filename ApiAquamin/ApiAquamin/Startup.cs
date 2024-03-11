@@ -22,7 +22,7 @@ public class Startup
         // Add database context
         services.AddDbContext<AQUAMINContext>(options => options.UseSqlServer(Configuration.GetConnectionString("cadenasql")));
         // Configure CORS
-        /*services.AddCors(options =>
+        services.AddCors(options =>
         {
             options.AddPolicy("AllowAnyOrigin", builder =>
             {
@@ -30,7 +30,7 @@ public class Startup
                        .AllowAnyMethod()
                        .AllowAnyHeader();
             });
-        });*/
+        });
         // Add custom services
         AddCustomServices(services);
     }
@@ -52,15 +52,16 @@ public class Startup
     // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
-        if (env.IsDevelopment())
+       /* if (env.IsDevelopment())
         {
             //AL SUNIR API AL HOSTING ELIMINAR LAS 2 LINEAS SIGUIENTES Y HABILITAR LA TERCERA
-            app.UseSwagger();
-            app.UseSwaggerUI();
+            
             //app.UseDeveloperExceptionPage();
-        }
+        }*/
+        app.UseSwagger();
+        app.UseSwaggerUI();
         // Enable CORS
-        //app.UseCors("AllowAnyOrigin");
+        app.UseCors("AllowAnyOrigin");
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseAuthorization();

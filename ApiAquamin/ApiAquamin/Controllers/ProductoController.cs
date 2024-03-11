@@ -1,9 +1,11 @@
 ﻿using ApiAquamin.Models.Formularios;
 using ApiAquamin.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiAquamin.Controllers
 {
+   
     [ApiController]
     [Route("Producto")]
     public class ProductoController : ControllerBase

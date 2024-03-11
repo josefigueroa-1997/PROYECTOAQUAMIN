@@ -1,10 +1,12 @@
 ﻿using ApiAquamin.Models;
 using ApiAquamin.Models.Formularios;
 using ApiAquamin.Services;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiAquamin.Controllers
 {
+   
     [ApiController]
     [Route("Venta")]
     public class VentaController : ControllerBase

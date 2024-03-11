@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ApiAquamin.Services;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Cors;
 
 namespace ApiAquamin.Controllers
 {
+  
     [ApiController]
     [Route("Sector")]
     public class SectorController : ControllerBase
