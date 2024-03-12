@@ -1,0 +1,22 @@
+.nav-link {
+    transition: all 0.3s ease;
+    color: white;
+}
+
+/* Estilo para el enlace del menú al pasar el mouse */
+.nav-link:hover {
+    background-color: white; /* Cambia a verde */
+    color: green; /* Cambia el color del texto a blanco */
+}
+nav {
+    background-color: #08C30D; /* Cambia a verde claro */
+}
+.profile-icon {
+    position: absolute;
+    top: 1rem; /* Ajusta la posición vertical */
+    right: 1rem; /* Ajusta la posición horizontal */
+    color: white;
+}
+.content-container {
+    margin-top: -1rem; /* Ajusta el margen superior negativo */
+}

@@ -1,0 +1,12 @@
+.search-bar {
+    float: right;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+.search-bar input[type="text"] {
+    border: 1px solid #6CB2EB;
+    padding: 5px;
+    border-radius: 5px;
+    width: 200px;
+}

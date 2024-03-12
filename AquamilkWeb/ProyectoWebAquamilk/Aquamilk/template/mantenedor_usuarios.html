@@ -1,0 +1,64 @@
+{% extends '_base.html' %}
+{% load static %}
+{% block title %}Mantenedor Usuarios{% endblock %}
+{% block css %}
+<link href="{% static 'css/usuario.css'%}" rel="stylesheet" type="text/css">
+{% endblock %}
+{% block content %}
+<div class="search-bar">
+    <input type="text" id="searchinput" placeholder="Buscar usuario...">
+</div>
+<table id="miTabla" class="min-w-full divide-y divide-gray-200">
+    <thead>
+        <tr class="bg-gray-50">
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Id</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Telefono</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calle</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comuna</th>
+        </tr>
+    </thead>
+    <tbody id="tablaUsuarios" class="bg-white divide-y divide-gray-200">
+        {% for usuario in usuarios %}
+        <tr>
+            <td class="px-6 py-4 whitespace-nowrap">{{usuario.id}}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{usuario.nombre}}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{usuario.telefono}}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{usuario.calle}}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{usuario.numero}}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{usuario.nombreComuna}}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+{% block scripts %}
+<script>
+    document.getElementById('searchinput').addEventListener('input',function(){
+
+var searchtext = this.value.toLowerCase();
+var rows = document.getElementById('tablaUsuarios').getElementsByTagName('tr');
+
+for(var i= 0;i< rows.length;i++){
+    var cells = rows[i].getElementsByTagName('td');
+    var found = false;
+
+    for(var j = 0;j<cells.length;j++){
+        var cellstext = cells[j].textContent.toLocaleLowerCase();
+        if(cellstext.indexOf(searchtext)>-1){
+            found = true;
+            break;
+        }
+    }
+    if(found){
+        rows[i].style.display = '';
+    }
+    else{
+        rows[i].style.display= 'none';
+    }
+}
+});
+
+</script>
+{% endblock %}

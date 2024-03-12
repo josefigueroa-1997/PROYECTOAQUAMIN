@@ -1,0 +1,47 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Tu Título Aquí{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.css">
+    <link href="{% static 'css/base.css'%}" rel="stylesheet" type="text/css">
+    {% block css %}
+    {% endblock %}
+</head>
+<body class="bg-gray-100">
+
+<!-- Header -->
+<header class="bg-blue-500 h-20 flex justify-center items-center shadow text-white">
+    <!-- Título -->
+    <h1 class="text-3xl font-bold">Mantenedor Negocio Aquamin</h1>
+    <i class="fas fa-user-circle text-3xl profile-icon"></i>
+</header>
+
+<!-- Barra de navegación -->
+<nav class="py-4">
+    <ul class="flex justify-center space-x-8">
+        <li><a href="#" class="nav-link px-4 py-2 rounded">Ventas</a></li>
+        <li><a href="#" class="nav-link px-4 py-2 rounded">Ruta</a></li>
+        <li><a href="{% url 'usuarios' %}" class="nav-link px-4 py-2 rounded">Usuarios</a></li>
+        <li><a href="#" class="nav-link px-4 py-2 rounded">Productos</a></li>
+    </ul>
+</nav>
+
+<!-- Contenido principal -->
+<main class="p-8">
+    <!-- Contenido principal -->
+    <div class="bg-white p-8 rounded shadow mt-8 content-container">
+        {% block content %}
+        <!-- Contenido de las páginas que hereden de este template -->
+        {% endblock %}
+    </div>
+</main>
+{% block scripts %}
+
+{% endblock %}
+</body>
+</html>
