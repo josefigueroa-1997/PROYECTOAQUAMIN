@@ -1,3 +1,25 @@
+.botonPersonalizados {
+    background-color: green;
+    color: white;
+    border: 2px solid green;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 8px;
+
+}
+
+.botonPersonalizados:hover {
+    background-color: white;
+    color: green;
+    border-color: 2px solid green;
+}
+
+
+
 .search-bar {
     float: right;
     margin-top: 10px;
