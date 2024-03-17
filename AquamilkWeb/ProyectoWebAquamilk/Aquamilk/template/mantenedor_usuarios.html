@@ -43,6 +43,7 @@
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Calle</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comuna</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"></th>
         </tr>
     </thead>
     <tbody id="tablaUsuarios" class="bg-white divide-y divide-gray-200">
@@ -54,16 +55,20 @@
             <td class="px-6 py-4 whitespace-nowrap">{{usuario.calle}}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{usuario.numero}}</td>
             <td class="px-6 py-4 whitespace-nowrap">{{usuario.nombreComuna}}</td>
+            <td class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded cursor-pointer editar-usuario" data-id="{{usuario.id}}">
+                <a href="{% url 'actualizar_usuario' usuario.id %}">Editar</a>
+              </td>
         </tr>
         {% endfor %}
         
     </tbody>
 </table>
-<!-- Nuevo Modal -->
+<!-- Modal Agregar Usuario -->
 <div id="miModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
   <div class="bg-white p-8 rounded-md max-w-screen-lg">
       <h2 class="text-lg font-semibold mb-4">Agregar Nuevo Usuario</h2>
-      <form id="formularioUsuario">
+      <form method="POST" id="formularioUsuario">
+        {% csrf_token %}
           <div class="flex flex-wrap -mx-3 mb-4">
               <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
                   <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre:</label>
@@ -91,8 +96,8 @@
               </div>
               <div class="w-full md:w-1/3 px-3">
                   <label for="comuna" class="block text-sm font-medium text-gray-700">Comuna:</label>
-                  <select id="comuna" name="comuna" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
-                    <option value="">Selecciona una comuna</option>
+                  <select id="comuna" name="comuna" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500" style="max-height: 200px; overflow-y: auto;">
+                    <option value="" disabled>Selecciona una comuna</option>
                     
                 </select>
               </div>
@@ -109,12 +114,12 @@
           </div>
           <div class="flex justify-end">
               <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Guardar</button>
-              <button id="cerrarModal" class="ml-2 bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
+              <button type="button" id="cerrarModal" class="ml-2 bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
           </div>
       </form>
   </div>
 </div>
-<!-- Fin Nuevo Modal -->
+<!-- Fin Modal  Ingresar Usuario-->
 
 {% endblock %}
 {% block scripts %}
@@ -134,12 +139,11 @@
      document.getElementById('formularioUsuario').addEventListener('submit', function(event) {
         event.preventDefault(); // Prevenir el envío del formulario
 
-        // Aquí puedes agregar el código para enviar los datos del formulario mediante AJAX o realizar cualquier otra acción necesaria
-
-        // Luego de procesar el formulario, puedes cerrar el modal
+        
         document.getElementById('miModal').classList.add('hidden');
     });
 </script>
+<!--BUSCARDOR DE DATOS EN LA TABLA-->
 <script>
     document.getElementById('searchinput').addEventListener('input',function(){
 
@@ -167,6 +171,7 @@ for(var i= 0;i< rows.length;i++){
 });
 
 </script>
+<!--OBTENER ROLES-->
 <script>
   $(document).ready(function() {
       $.ajax({
@@ -189,26 +194,79 @@ for(var i= 0;i< rows.length;i++){
       });
   });
 </script>
+<!--OBTENER ROLES-->
 <script>
   $(document).ready(function() {
       $.ajax({
           url: '{% url "obtener_roles" %}',
           type: 'GET',
           success: function(data) {
-              var selectRol = $('#rol');
+              var selectRol = $('#rol,#rolEdicion');
               selectRol.empty();
 
-              $.each(data.roles, function(index, comuna) {
+              $.each(data.roles, function(index, rol) {
                   selectRol.append($('<option>', {
-                      value: comuna.id,
-                      text: comuna.nombre
+                      value: rol.id,
+                      text: rol.nombre
                   }));
               });
           },
           error: function(xhr, status, error) {
-              console.error('Error al obtener comunas:', error);
+              console.error('Error al obtener roles:', error);
           }
       });
   });
 </script>
+<!--MUESTRA U OCULTA CORREO Y CONTRASEÑA DEPENDIENDO ROL-->
+<script>
+    $(document).ready(function() {
+        
+        $('#rol').change(function() {
+           
+            var selectedRol = $(this).val();
+
+        
+            if (selectedRol === '4') {
+               
+                $('#correo').closest('div').hide();
+                $('#contraseña').closest('div').hide();
+            } else {
+                
+                $('#correo').closest('div').show();
+                $('#contraseña').closest('div').show();
+            }
+        });
+    });
+</script>
+<script>
+    $(document).ready(function() {
+      
+        $('#formularioUsuario').submit(function(event) {
+            
+            event.preventDefault();
+
+         
+            var formData = $(this).serialize();
+
+          
+            $.ajax({
+                url: $(this).attr('action'), // Obtiene la URL de destino del formulario
+                type: 'POST', // Especifica el método de solicitud como POST
+                data: formData, // Establece los datos del formulario a enviar
+                success: function(response) {
+                    // Maneja la respuesta del servidor aquí, si es necesario
+                    // Por ejemplo, puedes redirigir al usuario a una nueva página después de que se haya agregado el usuario correctamente
+                    window.location.href = "{% url 'usuarios' %}";
+                },
+                error: function(xhr, status, error) {
+                    // Maneja los errores de la solicitud AJAX aquí, si es necesario
+                    console.error('Error al enviar el formulario:', error);
+                    // Puedes mostrar un mensaje de error al usuario o realizar otra acción según sea necesario
+                }
+            });
+        });
+    });
+</script>
+
+
 {% endblock %}

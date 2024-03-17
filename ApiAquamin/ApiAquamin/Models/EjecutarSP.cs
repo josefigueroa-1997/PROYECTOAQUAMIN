@@ -211,6 +211,9 @@ namespace ApiAquamin.Models
                                 Calle = reader.GetString(reader.GetOrdinal("CALLE")),
                                 Numero = reader.GetInt32(reader.GetOrdinal("NUMERO")),
                                 NombreComuna = reader.GetString(reader.GetOrdinal("NOMBRECOMUNA")),
+                                IdComuna = reader.GetInt32(reader.GetOrdinal("IDCOMUNA")),
+                                IdRol = reader.GetInt32(reader.GetOrdinal("IDROL")),
+                                IDireccion = reader.GetInt32(reader.GetOrdinal("IDIRECCION")),
                             };
                             usuarios.Add(usuario);
                         }
@@ -231,16 +234,7 @@ namespace ApiAquamin.Models
         {
             try
             {
-                string encryptedpass = "";
-                if (usuario.IdRol != 4)
-                {
-                    if (usuario.Correo != null && usuario.Contrasena != null)
-                    {
-                        encryptedpass = EncriptarContrasena(usuario.Contrasena);
-                    }
-                    else
-                        return false;
-                }
+                
                 DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
                 using(DbCommand command = connection.CreateCommand())
                 {
@@ -252,10 +246,8 @@ namespace ApiAquamin.Models
                     command.Parameters.Add(new SqlParameter("@CALLE", usuario.Calle));
                     command.Parameters.Add(new SqlParameter("@NUMERO", usuario.Numero));
                     command.Parameters.Add(new SqlParameter("@IDCOMUNA", usuario.IdComuna));
-                    command.Parameters.Add(new SqlParameter("@CORREO", usuario.Correo));
-                    command.Parameters.Add(new SqlParameter("@CONTRASENA", encryptedpass));
                     command.Parameters.Add(new SqlParameter("@IDIRECCION", usuario.IDireccion));
-                    command.Parameters.Add(new SqlParameter("@IDROL", usuario.IdRol));
+                    
                     await command.ExecuteNonQueryAsync();
                 }
                 await conexion.CloseDatabaseConnectionAsync();

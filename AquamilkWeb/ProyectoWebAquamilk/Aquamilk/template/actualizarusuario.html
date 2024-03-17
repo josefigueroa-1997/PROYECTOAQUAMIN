@@ -1,0 +1,105 @@
+{% extends '_base.html' %}
+{% load static %}
+{% block title %}Actualizar Usuarios{% endblock %}
+{% block css %}
+
+
+{% endblock %}
+
+{% block content %}
+
+<h2 class="text-lg font-semibold mb-4">Actualizar Datos Usuario</h2>
+        <form method="POST" id="formularioedicionUsuario">
+          {% csrf_token %}
+            <input type="hidden" name="usuario_id" id="usuario_id" value="{{usuario.0.id}}">
+            <div class="flex flex-wrap -mx-3 mb-4">
+                <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+                    <label for="nombre" class="block text-sm font-medium text-gray-700">Nombre:</label>
+                    <input type="text" id="nombreEdicion" name="nombreEdicion" value="{{usuario.0.nombre}}" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
+                </div>
+                <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+                    <label for="telefono" class="block text-sm font-medium text-gray-700">Teléfono:</label>
+                    <input type="text" id="telefonoEdicion" name="telefonoEdicion" value="{{usuario.0.telefono}}" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
+                </div>
+                <div class="w-full md:w-1/3 px-3">
+                    <label for="rol" class="block text-sm font-medium text-gray-700">Rol:</label>
+                    <select disabled id="rolEdicion" name="rol" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
+                      <option value="">Selecciona un rol</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex flex-wrap -mx-3 mb-4">
+                <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+                    <label for="calle" class="block text-sm font-medium text-gray-700">Calle:</label>
+                    <input type="text" id="calleEdicion" name="calleEdicion" value="{{usuario.0.calle}}" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
+                </div>
+                <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+                    <label for="numero" class="block text-sm font-medium text-gray-700">Número:</label>
+                    <input type="text" id="numeroEdicion" name="numeroEdicion" value="{{usuario.0.numero}}" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
+                </div>
+                <div class="w-full md:w-1/3 px-3">
+                    <label for="comuna" class="block text-sm font-medium text-gray-700">Comuna:</label>
+                    <select id="comunaEdicion" name="comunaEdicion" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500" style="max-height: 200px; overflow-y: auto;">
+                      
+                      
+                  </select>
+                </div>
+            </div>
+            
+            <div class="flex justify-end">
+                <input type="hidden" id="IdireccionEdicion" name="IdireccionEdicion" value="{{usuario.0.iDireccion}}">
+                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Editar</button>
+                
+            </div>
+        </form>
+{% endblock %}
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: '{% url "obtener_comunas" %}',
+            type: 'GET',
+            success: function(data) {
+                var selectComuna = $('#comunaEdicion');
+                selectComuna.empty();
+  
+                $.each(data.comunas, function(index, comuna) {
+                    selectComuna.append($('<option>', {
+                        value: comuna.id,
+                        text: comuna.nombre
+                    }));
+                });
+                selectComuna.val('{{usuario.0.idComuna}}');
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al obtener comunas:', error);
+            }
+        });
+    });
+  </script>
+<!--OBTENER ROLES-->
+<script>
+    $(document).ready(function() {
+        $.ajax({
+            url: '{% url "obtener_roles" %}',
+            type: 'GET',
+            success: function(data) {
+                var selectRol = $('#rolEdicion');
+                selectRol.empty();
+  
+                $.each(data.roles, function(index, rol) {
+                    selectRol.append($('<option>', {
+                        value: rol.id,
+                        text: rol.nombre
+                    }));
+                });
+                selectRol.val('{{usuario.0.idRol}}')
+            },
+            error: function(xhr, status, error) {
+                console.error('Error al obtener roles:', error);
+            }
+        });
+    });
+  </script>
+{% endblock %}
