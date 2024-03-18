@@ -1,7 +1,8 @@
 from django.shortcuts import render,redirect
 import requests
-from django.http import JsonResponse,HttpResponseBadRequest
-
+from django.http import JsonResponse,HttpResponse,HttpResponseBadRequest
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+import json
 #AGREGAR USUARIO
 def agregar_usuario(request):
     url_apipost = "http://www.aquamilk.somee.com/Usuario/AddUsuario"
@@ -28,7 +29,7 @@ def agregar_usuario(request):
         try:
             response = requests.post(url_apipost, json=usuario)
             if response.status_code == 200:
-                return redirect('usuarios')
+                return redirect('usuarios') + '?mensaje=Usuario registro exitosamente'
             else:
                 mensaje_error = f'Error al añadir un usuario: {response.status_code}'
                 return render(request, 'mantenedor_usuarios.html', {'error': mensaje_error})
@@ -45,6 +46,7 @@ def obtenerusuario(request):
         response = requests.get(urlapiget, params=parametros)
         if response.status_code == 200:
             usuarios = response.json()
+            
             context = {'usuarios': usuarios}
             return render(request, template_name, context)
         else:
@@ -117,8 +119,26 @@ def actualizarusuario(request,usuario_id):
         return render(request, template_name, {'error': mensaje_error})     
     
     
-    
-   
+#ELIMINAR USUARIO
+
+def eliminarusuario(request):
+    if request.POST:
+        id_usuario = request.POST.get('id_usuario')
+        if id_usuario:
+            url_api = f"http://www.aquamilk.somee.com/Usuario/DeleteUsuario/{id_usuario}"
+            try:
+                response = requests.delete(url_api)
+                if response.status_code == 200:
+                    return HttpResponse("Usuario eliminado con éxito")
+                else:
+                    return HttpResponseBadRequest("No se pudo eliminar con éxito")
+            except requests.exceptions.RequestException as e:
+                return HttpResponseBadRequest (f"Hubo un error al hacer la solucion:{e}")
+        else:
+            return HttpResponseBadRequest("ID de usuario no proporcionado en la solicitud")
+    else:
+        return HttpResponseBadRequest("La solicitud debe ser de tipo POST")
+
 #MANTENEDOR USUARIOS
 
 def mantenedor_usuarios(request):
@@ -129,5 +149,29 @@ def mantenedor_usuarios(request):
         return obtenerusuario(request)
 
 
-
+def login(request):
+    context = {}
+    template_name = "login.html"
+    if request.POST:
+        correo = request.POST.get('correo')
+        contrasena = request.POST.get('contrasena')
+        datos = {
+            "Correo":correo,
+            "contrasena":contrasena
+        }
+        url_api = "http://www.aquamilk.somee.com/Usuario/IniciarSesion"
+        response = requests.post(url_api,json=datos)
+        if response.status_code == 200:
+            resultado = response.json()
+            if resultado.get("idUsuario",0)>0:
+                request.session["idusuario"] = resultado.get("idUsuario",0)
+                request.session["idrol"] = resultado.get("idRol",0)
+                request.session["nombreusuario"] = resultado.get("nombreUsuario",0)
+                print(request.session["nombreusuario"])
+                return redirect('usuarios')
+            else:
+                return HttpResponse("No existe un usuario con esas creedenciales")
+        else:
+            return HttpResponse("Errol al llamar a la api")
+    return render(request,template_name,context)
     

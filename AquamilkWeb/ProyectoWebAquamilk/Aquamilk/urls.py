@@ -8,5 +8,7 @@ urlpatterns = [
     path('usuarios/',usuarioview.mantenedor_usuarios,name="usuarios"),
     path('recuperarusuarios/',usuarioview.recuperarusuarios,name="recuperar_usuarios"),
     path('actualizarusuario/<int:usuario_id>/', usuarioview.actualizarusuario, name="actualizar_usuario"),
+    path('eliminarusuario/',usuarioview.eliminarusuario,name="eliminar_usuario"),
     path('roles/',rolview.obtenerroles,name="obtener_roles"),
+    path('login/',usuarioview.login,name="login"),
 ]
