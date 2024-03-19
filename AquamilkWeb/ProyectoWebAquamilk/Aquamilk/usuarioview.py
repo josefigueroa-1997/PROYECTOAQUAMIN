@@ -1,7 +1,6 @@
 from django.shortcuts import render,redirect
 import requests
 from django.http import JsonResponse,HttpResponse,HttpResponseBadRequest
-from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import json
 #AGREGAR USUARIO
 def agregar_usuario(request):
@@ -142,16 +141,21 @@ def eliminarusuario(request):
 #MANTENEDOR USUARIOS
 
 def mantenedor_usuarios(request):
-    if request.POST:
-        return agregar_usuario(request)
-        
+    if "idusuario" not in request.session or request.session["idusuario"] is None:
+        return redirect('login')
     else:
-        return obtenerusuario(request)
-
+        if request.session["idrol"] == 1 or request.session["idrol"] == 2:
+            if request.POST:
+                return agregar_usuario(request)
+            else:
+                return obtenerusuario(request)
+        else:
+            return redirect('ruta')
 
 def login(request):
     context = {}
     template_name = "login.html"
+    error_message = None
     if request.POST:
         correo = request.POST.get('correo')
         contrasena = request.POST.get('contrasena')
@@ -167,11 +171,18 @@ def login(request):
                 request.session["idusuario"] = resultado.get("idUsuario",0)
                 request.session["idrol"] = resultado.get("idRol",0)
                 request.session["nombreusuario"] = resultado.get("nombreUsuario",0)
-                print(request.session["nombreusuario"])
-                return redirect('usuarios')
+                if request.session["idrol"] == 1 or request.session["idrol"] == 2:
+                    return redirect('usuarios')
+                elif request.session["idrol"] == 3:
+                    return redirect('ruta')
             else:
-                return HttpResponse("No existe un usuario con esas creedenciales")
+               error_message = "No existe un usuario con esas creedenciales"
         else:
             return HttpResponse("Errol al llamar a la api")
+    context['error_message'] = error_message
     return render(request,template_name,context)
-    
+
+
+def logout(request):
+    request.session.flush()
+    return redirect('login')

@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Formulario de Login</title>
-  <!-- Enlace a Tailwind CSS -->
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-  <!-- Estilos personalizados -->
-  <style>
+  <!-- Estilos personalizados -->  <style>
     body {
       background-color: #eff6ff; /* Fondo celeste */
     }
@@ -16,6 +14,14 @@
 <body class="flex justify-center items-center h-screen">
   <div class="bg-white p-8 rounded-lg shadow-md max-w-md w-full">
     <h2 class="text-2xl font-semibold mb-4 text-center">Inicio de Sesión</h2>
+    {% if error_message %}
+    <div class="mb-4">
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+        
+        <span class="block sm:inline">{{ error_message }}</span>
+      </div>
+    </div>
+    {% endif %}
     <form method="post">
         {% csrf_token %}
       <div class="mb-4">

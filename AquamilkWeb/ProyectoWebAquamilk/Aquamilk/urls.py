@@ -1,6 +1,5 @@
 from django.urls import path
-from . import comunaview
-from . import usuarioview,rolview
+from . import usuarioview,rolview,rutaview,comunaview
 
 urlpatterns = [
 
@@ -11,4 +10,6 @@ urlpatterns = [
     path('eliminarusuario/',usuarioview.eliminarusuario,name="eliminar_usuario"),
     path('roles/',rolview.obtenerroles,name="obtener_roles"),
     path('login/',usuarioview.login,name="login"),
+    path('logout/',usuarioview.logout,name="logout"),
+    path('ruta/',rutaview.obteneruta,name="ruta"),
 ]

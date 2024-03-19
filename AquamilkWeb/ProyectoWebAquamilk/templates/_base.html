@@ -10,25 +10,34 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.css">
     <link href="{% static 'css/base.css'%}" rel="stylesheet" type="text/css">
     {% block css %}
-    
+    <style>
+        .logout-link {
+            font-size: 0.8rem !important; /* Tamaño de la fuente más pequeño */
+}
+    </style>
     {% endblock %}
 </head>
-<body class="bg-gray-100">
+<body class="bg-gray-100 ">
 
 <!-- Header -->
 <header class="bg-blue-500 h-20 flex justify-center items-center shadow text-white">
     <!-- Título -->
-    <h1 class="text-3xl font-bold">Mantenedor Negocio Aquamin</h1>
-    <i class="fas fa-user-circle text-3xl profile-icon"></i>
+    <div class="flex items-center justify-center flex-grow"> <!-- Contenedor del título -->
+        <h1 class="text-3xl font-bold">Mantenedor Negocio Aquamin</h1>
+    </div>
+    <div class="flex items-center"> <!-- Contenedor del enlace -->
+        <a href="{% url 'logout' %}" class="text-sm font-bold ml-auto">Cerrar sesión</a>
+    </div>
 </header>
-
 <!-- Barra de navegación -->
 <nav class="py-4">
     <ul class="flex justify-center space-x-8">
-        <li><a href="#" class="nav-link px-4 py-2 rounded">Ventas</a></li>
-        <li><a href="#" class="nav-link px-4 py-2 rounded">Ruta</a></li>
+        {% if request.session.idrol == 1 or request.session.idrol == 2 %}
+        <li><a href="#" class="nav-link px-4 py-2 rounded">Ventas</a></li>   
         <li><a href="{% url 'usuarios' %}" class="nav-link px-4 py-2 rounded">Usuarios</a></li>
         <li><a href="#" class="nav-link px-4 py-2 rounded">Productos</a></li>
+        {% endif %}
+        <li><a href="{% url 'ruta' %}" class="nav-link px-4 py-2 rounded">Ruta</a></li>
     </ul>
 </nav>
 
@@ -42,7 +51,8 @@
     </div>
 </main>
 {% block scripts %}
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+
 {% endblock %}
 </body>
 </html>
