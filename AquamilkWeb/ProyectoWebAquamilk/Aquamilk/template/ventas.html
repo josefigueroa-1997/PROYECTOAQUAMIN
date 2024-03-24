@@ -1,0 +1,255 @@
+{% extends '_base.html' %}
+{% load static %}
+{% block title %}Ventas{% endblock %}
+{% block css %}
+<link href="{% static 'css/usuario.css'%}" rel="stylesheet" type="text/css">
+<link href="{% static 'css/ventas.css'%}" rel="stylesheet" type="text/css">
+<style>
+    .current-date-row {
+        background-color: orange; /* Cambia esto al color que desees */
+    }
+    /* Estilo para el acordeón */
+/* Estilo para el acordeón */
+
+
+</style>
+{% endblock %}
+
+
+{% block content %}
+<div class="search-bar">
+    <input type="text" id="searchinput" placeholder="Buscar usuario...">
+   
+</div>
+<div class="container mx-auto mt-4">
+    <div class="text-center"> <!-- Agrega la clase text-center aquí -->
+        <h1 class="text-2xl font-bold">Ventas {% if tipoventa %}{{ tipoventa }}{% endif %}</h1>
+    </div>
+    <ul class="flex">
+        <li class="mr-6">
+            <a href="{% url 'obtenerventas' tipoventa='Planta' %}" class="text-blue-500 hover:text-blue-800" data-tipoventa="Planta">Planta</a>
+        </li>
+        <li class="mr-6">
+            <a href="{% url 'obtenerventas' tipoventa='Hogar' %}" class="text-blue-500 hover:text-blue-800" data-tipoventa="Hogar">Hogar</a>
+        </li>
+    </ul>
+
+</div>
+
+<div class="overflow-y-auto">
+    <div class="min-w-full">
+    
+<table id="tablaventas" class="min-w-full divide-y divide-gray-200">
+    <thead class="sticky top-0 ">
+        <tr class="bg-gray-50">
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Numero Venta</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">20 LTS</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">10 LTS</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalle</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metodo Pago</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado Pago</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comuna</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Historial</th>
+        </tr>
+    </thead>
+    {% if ventas %}    
+    <tbody id="tablaVentas" class="bg-white divide-y divide-gray-200">
+        {% for venta in ventas %}
+        <tr>
+            <td class="px-6 py-4 whitespace-nowrap">{{ venta.numeroVenta }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ venta.fecha }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ venta.nombreUsuario }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ venta.veinteLTS }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ venta.diezLTS }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ venta.detalle }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ venta.metodo_Pago }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+                {% if venta.estado_Pago == 'PAGADO' %}
+                <input type="checkbox" class="form-checkbox h-6 w-6 text-green-500 border-gray-300 rounded focus:ring-green-500 {% if venta.estado_Pago == 'PAGADO' %} bg-green-500 {% endif %}" {% if venta.estado_Pago == 'PAGADO' %} checked {% endif %}>
+
+                {% else %}
+                <input type="checkbox" class="form-checkbox h-6 w-6 text-green-500 border-gray-300 rounded focus:ring-green-500 {% if venta.estado_Pago == 'PAGADO' %} bg-green-500 {% endif %}" {% if venta.estado_Pago == 'PAGADO' %} checked {% endif %}>
+
+                {% endif %}
+            </td>   
+            <td class="px-6 py-4 whitespace-nowrap">{{ venta.comuna }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ venta.total }}</td>
+        <td id="btnhistorial" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded cursor-pointer btn-historial" data-id="{{venta.idUsuario}}" data-fecha="{{ venta.fecha }}">
+            <a href="#">Ver Historial</a>
+        </td>
+        
+        </tr>
+        
+        {% endfor %}
+    </tbody>
+    {% endif %}
+</table>
+
+</div>
+</div>
+<!--MODAL HISTORIAL VENTAS CLIENTE-->
+<div id="miModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+    <div class="bg-white p-8 rounded-md max-w-screen-lg">
+        <h2 class="text-lg font-semibold mb-4">Historial Ventas Usuario</h2>
+        <div class="modal-content">
+            
+            <div id="accordion" class="divide-y divide-gray-200"></div>
+        </div>
+        <form method="POST" id="formularioUsuario">
+            <button type="button" id="cerrarModal" class="ml-2 bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!--BUSCARDOR DE DATOS EN LA TABLA-->
+<script>
+    document.getElementById('searchinput').addEventListener('input',function(){
+
+var searchtext = this.value.toLowerCase();
+var rows = document.getElementById('tablaVentas').getElementsByTagName('tr');
+
+for(var i= 0;i< rows.length;i++){
+    var cells = rows[i].getElementsByTagName('td');
+    var found = false;
+
+    for(var j = 0;j<cells.length;j++){
+        var cellstext = cells[j].textContent.toLocaleLowerCase();
+        if(cellstext.indexOf(searchtext)>-1){
+            found = true;
+            break;
+        }
+    }
+    if(found){
+        rows[i].style.display = '';
+    }
+    else{
+        rows[i].style.display= 'none';
+    }
+}
+});
+
+</script>
+<script>
+var btnsHistorial = document.getElementsByClassName('btn-historial');
+    for (var i = 0; i < btnsHistorial.length; i++) {
+        btnsHistorial[i].addEventListener('click', function() {
+            // Muestra el modal
+            document.getElementById('miModal').classList.remove('hidden');
+        });
+    }
+
+    document.getElementById('cerrarModal').addEventListener('click', function() {
+        // Oculta el modal
+        document.getElementById('miModal').classList.add('hidden');
+    });
+</script>
+<!--MOSTRAR HISTORIAL USUARIO-->
+<script>
+    $(document).ready(function(){
+        var colors = ['#3498db', '#ffffff', '#2ecc71']; // Colores para los bloques de acordeón (azul, blanco, verde)
+        var colorIndex = 0;
+        var colorCount = colors.length;
+        
+        $('.btn-historial').click(function(){
+
+            var idUsuario = $(this).data('id');
+            var fechaString = $(this).data('fecha');
+            // Dividir la cadena en partes (día, mes, año)
+            var partesFecha = fechaString.split('/');
+            var dia = partesFecha[0];
+            var mes = partesFecha[1];
+            var año = partesFecha[2];
+
+            // Reformatear la fecha al formato yyyy-mm-dd
+            var fechaFormateada = año + '-' + mes + '-' + dia;
+
+            // Crear un objeto Date con la fecha formateada
+            var fecha = new Date(fechaFormateada);
+            
+
+            $.ajax({
+                url: "{% url 'historialventas' %}",
+                method: 'GET',
+                data: {
+                    'idusuario': idUsuario,
+                    'fecha': fecha.toISOString()
+                },
+                success: function(data){
+                    // Vaciar el contenido anterior
+                    $('#accordion').empty();
+
+                    // Iterar sobre los datos y agregarlos a los acordeones
+                    $.each(data, function(index, item){
+                        var collapseId = 'collapse-' + index;
+                        var accordionItem = $('<div class="accordion-item w-full">'); // Agregar la clase w-full para ocupar todo el ancho disponible
+                        var accordionHeader = $('<div class="accordion-header collapsed">').append($('<button class="accordion-button" type="button">').text('ID Venta: ' + item.idventa + ' - Tipo Producto: ' + item.tipO_PRODUCTO + ' - Precio: ' + item.preciounitario));
+                        var accordionCollapse = $('<div id="' + collapseId + '" class="accordion-content" style="display: none;">').text('Detalle: ' + item.detalle + ' - Estado de Pago: ' + item.estadO_PAGO + ' - Método de Pago: ' + item.metodO_PAGO + ' - Total: ' + item.cantidad * item.preciounitario);
+
+                        // Agregar el encabezado y el contenido del acordeón al contenedor de acordeones
+                        accordionItem.append(accordionHeader, accordionCollapse);
+                        $('#accordion').append(accordionItem);
+
+                        // Alternar el color del bloque de acordeón
+                        accordionItem.css('background-color', colors[colorIndex]);
+
+                        // Cambiar al siguiente color en el array de colores
+                        colorIndex = (colorIndex + 1) % colorCount;
+
+                        // Agregar evento de clic al encabezado para expandir/cerrar el contenido
+                        accordionHeader.click(function(){
+                            $(this).toggleClass('active');
+                            $(this).toggleClass('collapsed'); // Agregar o quitar la clase collapsed al hacer clic
+                            $(this).next('.accordion-content').slideToggle();
+                        });
+                    });
+
+                    // Mostrar el modal
+                    $('#miModal').removeClass('hidden');
+                },
+                error: function(xhr, status, error){
+                    console.error('Error al obtener el historial de ventas del usuario:', error);
+                }
+            });
+        });
+
+        $('#cerrarModal').click(function(){
+            $('#miModal').addClass('hidden');
+        });
+    });
+</script>
+<!--MARCAR FILAS CON FECHA ACTUAL-->
+<script>
+$(document).ready(function(){
+    // Formatear la fecha actual
+    var currentDate = new Date().toLocaleDateString('es-ES');
+
+    $('#tablaVentas tr').each(function(){
+        // Obtener la fecha de la fila y formatearla
+        var rowDateStr = $(this).find('td:eq(1)').text().trim();
+        var rowDateParts = rowDateStr.split('/');
+        var formattedRowDate = rowDateParts[1] + '/' + rowDateParts[0] + '/' + rowDateParts[2];
+        var rowDate = new Date(formattedRowDate);
+
+        if (!isNaN(rowDate.getTime())) {
+            // Si la fecha es válida, continuamos con la comparación
+            var rowFormattedDate = rowDate.toLocaleDateString('es-ES');
+            // Comparar las fechas
+            if (rowFormattedDate === currentDate) {
+                $(this).addClass('current-date-row');
+            } else {
+                console.log("Fecha de la fila no coincide con la fecha actual.");
+            }
+        } else {
+            console.log("Fecha de la fila no válida:", rowDateStr);
+        }
+    });
+});
+</script>
+{% endblock %}

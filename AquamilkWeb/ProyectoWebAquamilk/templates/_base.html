@@ -33,7 +33,7 @@
 <nav class="py-4">
     <ul class="flex justify-center space-x-8">
         {% if request.session.idrol == 1 or request.session.idrol == 2 %}
-        <li><a href="#" class="nav-link px-4 py-2 rounded">Ventas</a></li>   
+        <li><a href="{% url 'obtenerventas' tipoventa='Planta' %}" class="nav-link px-4 py-2 rounded">Ventas</a></li>   
         <li><a href="{% url 'usuarios' %}" class="nav-link px-4 py-2 rounded">Usuarios</a></li>
         <li><a href="#" class="nav-link px-4 py-2 rounded">Productos</a></li>
         {% endif %}

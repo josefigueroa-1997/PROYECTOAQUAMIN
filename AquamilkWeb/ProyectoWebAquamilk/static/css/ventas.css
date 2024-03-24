@@ -1,0 +1,25 @@
+.overflow-y-auto {
+    overflow-y: auto;
+    max-height: 400px; /* Ajusta la altura máxima según tus necesidades */
+}
+.min-w-full {
+    width: 100%;
+    max-height: 400px; /* Altura máxima del contenedor de la tabla */
+    overflow-y: auto; /* Agrega desplazamiento vertical si es necesario */
+}
+
+.min-w-full table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.min-w-full thead th {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 1;
+}
+.min-w-full thead {
+        background-color: #1f2024; /* Cambia este color al que desees */
+        color: rgb(34, 32, 32); /* Cambia el color del texto si es necesario */
+    }

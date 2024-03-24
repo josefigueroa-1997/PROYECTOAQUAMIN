@@ -577,7 +577,8 @@ namespace ApiAquamin.Models
                         var venta = new VentaDTO()
                         {
                             NumeroVenta = reader.GetInt32(reader.GetOrdinal("NumeroVenta")),
-                            Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")),
+                            Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")).ToString("dd/MM/yyyy"),
+                            IdUsuario = reader.GetInt32(reader.GetOrdinal("IDUSUARIO")),
                             NombreUsuario = reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
                             veinteLTS = reader.GetInt32(reader.GetOrdinal("veinteLTS")),    
                             diezLTS = reader.GetInt32(reader.GetOrdinal("diezLTS")),
@@ -611,7 +612,9 @@ namespace ApiAquamin.Models
                     cmd.CommandText = "HISTORIALPRODCTOCLIENTE";
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.Parameters.Add(new SqlParameter("@IDUSUARIO",idusuario));
-                    cmd.Parameters.Add(new SqlParameter("@FECHA",fecha));
+                    SqlParameter parameterFecha = new SqlParameter("@FECHA", SqlDbType.Date);
+                    parameterFecha.Value = fecha;
+                    cmd.Parameters.Add(parameterFecha);
                     var reader = await cmd.ExecuteReaderAsync();
                     while(await reader.ReadAsync())
                     {

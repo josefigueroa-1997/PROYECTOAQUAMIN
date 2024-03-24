@@ -3,7 +3,8 @@
     public class VentaDTO
     {
         public int NumeroVenta { get; set; }
-        public DateTime Fecha { get; set; }
+        public string Fecha { get; set; } = null!;
+        public int IdUsuario { get; set; }
         public string NombreUsuario { get; set; } = null!;
         public int veinteLTS { get; set; }
         public int diezLTS { get; set; }

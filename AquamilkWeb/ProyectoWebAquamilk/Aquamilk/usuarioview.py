@@ -56,21 +56,6 @@ def obtenerusuario(request):
         return render(request, template_name, {'error': mensaje_error})
 
 
-
-def recuperarusuarios(request):
-    url_api_get = "http://www.aquamilk.somee.com/Usuario/GetUsuarios"
-    usuario_id = request.GET.get('id') 
-    try:
-        response = requests.get(url_api_get, params={'id':usuario_id})
-        response.raise_for_status()
-        usuarios = response.json()
-        return JsonResponse(usuarios, safe=False)
-    except requests.RequestException as e:
-        mensaje_error = f'Error al obtener usuarios: {str(e)}'
-        return JsonResponse({'error': mensaje_error}, status=500)
-
-
-
 # ACTUALIZAR DATOS USUARIOS
     
 def actualizarusuario(request,usuario_id):
@@ -91,8 +76,7 @@ def actualizarusuario(request,usuario_id):
             'Calle': calle,
             'Numero': numero,
             'IdComuna': comuna,
-            'IDireccion':Idireccion,
-            
+            'IDireccion':Idireccion,  
         }
         try:
             response = requests.put(url_api_put, json=usuario)
