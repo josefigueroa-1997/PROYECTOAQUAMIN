@@ -37,10 +37,9 @@ def agregar_usuario(request):
             return render(request, 'mantenedor_usuarios.html', {'error': mensaje_error})
 
 #OBTENER USUARIO
-def obtenerusuario(request):
+def obtenerusuario(request,template_name):
     urlapiget = "http://www.aquamilk.somee.com/Usuario/GetUsuarios"
     parametros = {'id': request.GET.get('id'), 'nombre': request.GET.get('nombre')}
-    template_name = "mantenedor_usuarios.html"
     try:
         response = requests.get(urlapiget, params=parametros)
         if response.status_code == 200:
@@ -55,7 +54,17 @@ def obtenerusuario(request):
         mensaje_error = f'Error al realizar la solicitud HTTP: {e}'
         return render(request, template_name, {'error': mensaje_error})
 
-
+def recuperarusuarios(request):
+    urlapi = "http://www.aquamilk.somee.com/Usuario/GetUsuarios"
+    parametros = {'id':request.GET.get('id')}
+    response = requests.get(urlapi,params=parametros)
+    if response.status_code == 200:
+        usuarios = response.json()
+        return JsonResponse ({'usuarios':usuarios})
+    else:
+        mensaje_error = f'Error al obtener las comunas.Código de estado:{response.status_code}'
+        return JsonResponse({'error': mensaje_error},status=response.status_code)
+    
 # ACTUALIZAR DATOS USUARIOS
     
 def actualizarusuario(request,usuario_id):
@@ -132,7 +141,8 @@ def mantenedor_usuarios(request):
             if request.POST:
                 return agregar_usuario(request)
             else:
-                return obtenerusuario(request)
+                template_name = request.GET.get('usuarios','mantenedor_usuarios.html')
+                return obtenerusuario(request,template_name)
         else:
             return redirect('ruta')
 

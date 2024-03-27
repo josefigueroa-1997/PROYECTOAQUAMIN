@@ -23,3 +23,42 @@
         background-color: #1f2024; /* Cambia este color al que desees */
         color: rgb(34, 32, 32); /* Cambia el color del texto si es necesario */
     }
+
+    .current-date-row {
+        background-color: orange; /* Cambia esto al color que desees */
+    }
+ /* Estilo para el acordeón */
+ .accordion-item {
+        border: 1px solid black; /* Añade un borde negro */
+        border-radius: 5px; /* Ajusta el valor según sea necesario */
+        overflow: hidden; /* Oculta los bordes redondeados del contenido que se desborda */
+        margin-bottom: 5px; /* Ajusta el espacio entre los acordeones */
+        width: 100%; /* Haz que cada acordeón ocupe el ancho completo */
+        cursor:pointer;
+    }
+    
+    .accordion-content {
+        border-radius: 0 0 10px 10px; /* Ajusta el valor según sea necesario */
+        overflow: hidden; /* Oculta los bordes redondeados del contenido que se desborda */
+        display: none; /* Oculta el contenido por defecto */
+    }
+    .botonPersonalizados {
+        background-color: green;
+        color: white;
+        border: 2px solid green;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 8px;
+    
+    }
+    
+    .botonPersonalizados:hover {
+        background-color: white;
+        color: green;
+        border-color: 2px solid green;
+    }
+    

@@ -1,5 +1,5 @@
 from django.urls import path
-from . import usuarioview,rolview,rutaview,comunaview,ventasview
+from . import usuarioview,rolview,rutaview,comunaview,ventasview,productoview
 
 urlpatterns = [
 
@@ -13,4 +13,6 @@ urlpatterns = [
     path('ruta/',rutaview.obteneruta,name="ruta"),
     path('obtenerventas/<tipoventa>',ventasview.obtenerventas,name="obtenerventas"),
     path('historialventas/',ventasview.historialventasusuario,name="historialventas"),
+    path('recuperarusuarios/',usuarioview.recuperarusuarios,name="recuperarusuarios"),
+    path('recuperarproductos/',productoview.recuperarproductos,name="recuperarproductos"),
 ]
