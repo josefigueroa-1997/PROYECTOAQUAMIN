@@ -5,16 +5,13 @@
 <link href="{% static 'css/usuario.css'%}" rel="stylesheet" type="text/css">
 <link href="{% static 'css/ventas.css'%}" rel="stylesheet" type="text/css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<style>
-
-</style>
 {% endblock %}
 
 
 {% block content %}
 
 <div class="search-bar">
-    <input type="text" id="searchinput" placeholder="Buscar usuario...">
+    <input type="text" id="searchinput" placeholder="Buscar venta...">
    
 </div>
 <button class="botonPersonalizados" id="botonPersonalizado">Agregar Venta</button>
@@ -24,10 +21,10 @@
     </div>
     <ul class="flex">
         <li class="mr-6">
-            <a href="{% url 'obtenerventas' tipoventa='Planta' %}" class="text-blue-500 hover:text-blue-800" data-tipoventa="Planta">Planta</a>
+            <a href="{% url 'ventas' %}" class="text-blue-500 hover:text-blue-800" data-tipoventa="Planta">Planta</a>
         </li>
         <li class="mr-6">
-            <a href="{% url 'obtenerventas' tipoventa='Hogar' %}" class="text-blue-500 hover:text-blue-800" data-tipoventa="Hogar">Hogar</a>
+            <a href="{% url 'ventas' %}?tipoventa=Hogar" class="text-blue-500 hover:text-blue-800" data-tipoventa="Hogar">Hogar</a>
         </li>
     </ul>
 
@@ -74,9 +71,11 @@
             </td>   
             <td class="px-6 py-4 whitespace-nowrap">{{ venta.comuna }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ venta.total }}</td>
-        <td id="btnhistorial" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded cursor-pointer btn-historial" data-id="{{venta.idUsuario}}" data-fecha="{{ venta.fecha }}">
-            <a href="#">Ver Historial</a>
+        
+        <td class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded cursor-pointer ver-historial-btn" data-idusuario="{{ venta.idUsuario }}" data-fecha="{{ venta.fecha }}">
+            Ver Historial
         </td>
+        
         
         </tr>
         
@@ -91,7 +90,7 @@
 <div id="modalventa" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
     <div class="bg-white p-8 rounded-md max-w-screen-lg">
         <h2 class="text-lg font-semibold mb-4">Agregar Nueva Venta</h2>
-        <form method="POST" id="formularioUsuario">
+        <form method="POST" id="formularioVenta">
           {% csrf_token %}
           <div class="flex flex-wrap -mx-3 mb-4">
             
@@ -112,80 +111,68 @@
                 <input type="date" id="fecha" name="fecha" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
             </div>
         </div>
-            <div class="flex flex-wrap -mx-3 mb-4">
-                <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
-                    <label for="metododepago" class="block text-sm font-medium text-gray-700">Metodo de Pago:</label>
-                    <select id="metodo" name="metodo" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500 " style="max-height: 200px; overflow-y: auto; width: 100%; height: 40px;">
-                        <option value="" >Selecciona un Metodo de Pago</option>
-                        <option value="EFECTIVO">Efectivo</option>
-                        <option value="TARJETA">Tarjeta</option>
-                        <option value="TRANSFERENCIA">Transferencia</option>
-                    </select>
-                </div>
-                <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
-                    <label for="tipodeventa" class="block text-sm font-medium text-gray-700">Tipo de Venta:</label>
-                    <input disabled type="text" id="tipodeventa" name="tipodeventa" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
-                </div>
-                <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
-                    <label for="estadoPago" class="block text-sm font-medium text-gray-700">Estado de Pago:</label>
-                    <div class="flex items-center mt-2">
-                    <input type="radio" id="pagado" name="estadoPago" value="pagado" class="mr-2">
+
+        <div class="flex flex-wrap -mx-3 mb-4">
+            <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+                <label for="metododepago" class="block text-sm font-medium text-gray-700">Método de Pago:</label>
+                <select id="metodo" name="metodo" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500 " style="max-height: 200px; overflow-y: auto; width: 100%; height: 40px;">
+                    <option value="" >Selecciona un Método de Pago</option>
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="TARJETA">Tarjeta</option>
+                    <option value="TRANSFERENCIA">Transferencia</option>
+                </select>
+            </div>
+            
+            <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+                <label for="estadoPago" class="block text-sm font-medium text-gray-700">Estado de Pago:</label>
+                <div class="flex items-center mt-2">
+                    <input type="radio" id="pagado" name="estadoPago" value="PAGADO" class="mr-2">
                     <label for="pagado" class="mr-4">Pagado</label>
 
-                    <input type="radio" id="noPagado" name="estadoPago" value="noPagado" class="mr-2">
+                    <input type="radio" id="noPagado" name="estadoPago" value="NO_PAGADO" class="mr-2">
                     <label for="noPagado">No Pagado</label>
                 </div>
             </div>
+
+            <div class="w-full md:w-1/3 px-3 mb-4 md:mb-0">
+                <label for="cantidad" class="block text-sm font-medium text-gray-700">Cantidad:</label>
+                <input type="number" id="cantidad" name="cantidad" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
             </div>
-            <div class="flex flex-wrap -mx-3 mb-4">
-                <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
-                    <label for="Prioridad" class="block text-sm font-medium text-gray-700">Prioridad:</label>
-                    <select id="prioridad" name="usuario" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500 " style="max-height: 200px; overflow-y: auto; width: 100%; height: 40px;">
-                        <option value="" >Selecciona una Prioridad</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                    </select>
-                </div>
-                <div class="w-full md:w-1/2 px-3">
-                    <label for="Cantidad" class="block text-sm font-medium text-gray-700">Cantidad:</label>
-                    <input type="number" id="cantidad" name="cantidad" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
-                </div>
+        </div>
+
+        <div class="flex flex-wrap -mx-3 mb-4">
+            <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
+                <label for="Prioridad" class="block text-sm font-medium text-gray-700">Prioridad:</label>
+                <select id="prioridad" name="prioridad" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500 " style="max-height: 200px; overflow-y: auto; width: 100%; height: 40px;">
+                    <option value="" >Selecciona una Prioridad</option>
+                    <option value="1">1</option>
+                    <option value="2">2</option>
+                    <option value="3">3</option>
+                </select>
             </div>
-            <div class="flex flex-wrap -mx-3 mb-4">
-                <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
-                    <label for="Calle" class="block text-sm font-medium text-gray-700">Calle:</label>
-                    <input type="text" id="calle" name="calle" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
-                </div>
-                <div class="w-full md:w-1/2 px-3">
-                    <label for="Numero" class="block text-sm font-medium text-gray-700">Número:</label>
-                    <input type="number" id="numero" name="numero" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
-                </div>
+            <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
+                <label for="Precio" class="block text-sm font-medium text-gray-700">Precio:</label>
+                <input disabled type="text" id="precio" name="precio" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
             </div>
-            <div class="flex flex-wrap -mx-3 mb-4">
-                <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
-                    <label for="Precio" class="block text-sm font-medium text-gray-700">Precio:</label>
-                    <input disabled type="text" id="precio" name="precio" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
-                </div>
-                
-            </div>
-            <div class="flex justify-end">
-                <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Agendar</button>
-                <button type="button" id="cerrarmodalventa" class="ml-2 bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
-            </div>
-        </form>
-    </div>
-  </div>
+        </div>
+        <input  type="hidden" id="tipodeventa" name="tipodeventa" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
+        <div class="flex justify-end">
+            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-md">Agendar</button>
+            <button type="button" id="cerrarmodalventa" class="ml-2 bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
+        </div>
+    </form>
+</div>
+
 <!--MODAL HISTORIAL VENTAS CLIENTE-->
-<div id="miModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
+<div id="modalHistorialCliente" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
     <div class="bg-white p-8 rounded-md max-w-screen-lg">
         <h2 class="text-lg font-semibold mb-4">Historial Ventas Usuario</h2>
         <div class="modal-content">
-            
-            <div id="accordion" class="divide-y divide-gray-200"></div>
+            <p>fsdogjmfdlkgfjglfkjgfdlgkj</p>
+            <!--<div id="accordion" class="divide-y divide-gray-200"></div>-->
         </div>
         
-            <button type="button" id="cerrarModal" class="ml-2 bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
+            <button type="button" id="cerrarModalHistorialCliente" class="ml-2 bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
         
     </div>
 </div>
@@ -195,17 +182,41 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <script>
-    document.getElementById('botonPersonalizado').addEventListener('click', function() {
-        // Muestra el modal
-        document.getElementById('modalventa').classList.remove('hidden');
+    document.querySelectorAll('.ver-historial-btn').forEach(function(button) {
+    button.addEventListener('click', function() {
+        var idUsuario = this.getAttribute('data-idusuario');
+        var fecha = this.getAttribute('data-fecha');
+        window.location.href = '{% url "historial" %}?idusuario=' + idUsuario + '&fecha=' + encodeURIComponent(fecha);
+    });
+});
+</script>
+<script>
+    document.getElementById('botonPersonalizado').addEventListener('click', function(event) {
+        event.stopPropagation();
+        // Oculta el modal de Historial Cliente si está abierto
+        
+        // Muestra el modal de Agendar Venta
+        $('#modalventa').removeClass('hidden');
     });
 
     document.getElementById('cerrarmodalventa').addEventListener('click', function() {
-        // Oculta el modal
-        document.getElementById('modalventa').classList.add('hidden');
+        // Oculta el modal de Agendar Venta
+        $('#modalventa').addClass('hidden');
+    });
+</script>
+<script>
+    // Agregar un evento de clic al botón de historial
+    $('.btnhistorial').click(function() {
+        // Muestra el modal de historial de ventas del cliente
+        $('#modalHistorialCliente').removeClass('hidden');
+        
     });
 
-
+    // Agregar un evento de clic al botón de cancelar en el modal de historial de ventas del cliente
+    $('#cerrarModalHistorialCliente').click(function() {
+        // Oculta el modal de historial de ventas del cliente
+        $('#modalHistorialCliente').addClass('hidden');
+    });
 </script>
 <!--OBTENER USUARIOS-->
 <script>
@@ -224,6 +235,7 @@
                 data.usuarios.forEach(function(usuario) {
                     var opcion = new Option(usuario.nombre, usuario.id);
                     selectUsuarios.add(opcion);
+                   
                     opcionesOriginales.push(opcion);
                 });
                 $('#usuario').select2();
@@ -233,39 +245,113 @@
             }
         });
     }
+   
+
     cargaropciones();
     
    
   </script>
   <!--OBTENER PRODUCTOS-->
 <script>
-    var selectProductos = document.getElementById('producto');
-    var opcionesOriginales = [];
-    function cargarproductos(){
+     
+    // Función para cargar los productos en el select2
+    function cargarProductosEnSelect2(productos) {
+        var selectProducto = $('#producto');
+        selectProducto.empty(); // Limpiar el select2
+        
+        // Agregar la opción por defecto
+        selectProducto.append($('<option>').attr('value', '').text('Selecciona un producto'));
+        
+        // Agregar las opciones de productos
+        productos.forEach(function(producto) {
+            selectProducto.append($('<option>').attr('value', producto.id).text(producto.tipo_Producto + ' - Precio: ' + producto.precio));
+        });
+        
+ 
+      
+        
+        // Llamar a la función para establecer el tipo de venta después de cargar los productos
+        establecerTipoVenta();
+    }
+    
+    // Función para establecer el tipo de venta según el producto seleccionado
+    function establecerTipoVenta() {
+        var selectProducto = document.getElementById('producto');
+        var tipoVentaInput = document.getElementById('tipodeventa');
+
+        // Verificar si selectProducto y tipoVentaInput son elementos válidos
+        if (selectProducto && tipoVentaInput) {
+            // Obtener el índice seleccionado del producto
+            var selectedIndex = selectProducto.selectedIndex;
+
+            // Verificar si se ha seleccionado un producto real (el índice es mayor que 0)
+            if (selectedIndex > 0) {
+                // Obtener el texto del producto seleccionado
+                var productoSeleccionado = selectProducto.options[selectedIndex].text;
+
+                // Depuración: Imprimir el valor del producto seleccionado en la consola
+                console.log('Producto seleccionado:', productoSeleccionado);
+
+                // Verificar si el producto contiene la palabra "Planta"
+                if (productoSeleccionado.includes('Planta')) {
+                    // Si el producto es de tipo "Planta", establecer el tipo de venta como "Planta"
+                    tipoVentaInput.value = 'Planta';
+                } else if (productoSeleccionado.includes('Hogar')) {
+                    // Si el producto es de tipo "Hogar", establecer el tipo de venta como "Hogar"
+                    tipoVentaInput.value = 'Hogar';
+                } else {
+                    // Si el producto no coincide con ninguno de los criterios anteriores, dejar el campo de tipo de venta vacío
+                    tipoVentaInput.value = '';
+                }
+
+                // Depuración: Imprimir el valor del campo tipodeventa después de la asignación
+                console.log('Tipo de venta:', tipoVentaInput.value);
+            }
+        }
+        habilitarprioridad();
+    }
+    function habilitarprioridad() {
+        var tipoventa = document.getElementById('tipodeventa');
+        var prioridad = document.getElementById('prioridad');
+
+        if (tipoventa.value.toLowerCase() === 'hogar') {
+            prioridad.disabled = false;
+        } else {
+            prioridad.disabled = true;
+            prioridad.selectedIndex = 0;
+        }
+    }
+
+    // Llamar a la función para cargar los productos una vez que se haya cargado la página
+    $(document).ready(function() {
+        // Realizar una solicitud AJAX para recuperar los productos
         $.ajax({
             url: '{% url "recuperarproductos" %}',
             type: 'GET',
             success: function(data) {
-                // Limpiar el select
-                selectProductos.innerHTML = '<option value="" disabled>Selecciona un Producto</option>';
-                opcionesOriginales = [];
-
-                // Agregar las opciones recibidas del servidor
-                data.productos.forEach(function(producto) {
-                    var opcion = new Option(producto.tipo_Producto, producto.id);
-                    selectProductos.add(opcion);
-                    opcionesOriginales.push(opcion);
-                });
-                
-                
+                // Verificar si se recibieron los datos correctamente
+                if (data.hasOwnProperty('productos')) {
+                    // Llamar a la función para cargar los productos en el select2
+                    cargarProductosEnSelect2(data.productos);
+                } else {
+                    console.error('Los datos recibidos no contienen la lista de productos.');
+                }
             },
             error: function(xhr, status, error) {
-                console.error('Error al obtener productos:', error);
+                console.error('Error al recuperar los productos:', error);
             }
         });
-    }
-    cargarproductos();
-    
+    });
+
+    // Agregar un event listener para el cambio en el campo de selección de productos
+    $(document).on('change', '#producto', function() {
+        // Llamar a la función para establecer el tipo de venta cada vez que se cambie la selección de productos
+        establecerTipoVenta();
+    });
+    document.getElementById('tipodeventa').addEventListener('input', function() {
+        habilitarprioridad();
+    });
+</script>
 </script>
 <!--BUSCARDOR DE DATOS EN LA TABLA-->
 <script>
@@ -295,44 +381,31 @@ for(var i= 0;i< rows.length;i++){
 });
 
 </script>
-<script>
-var btnsHistorial = document.getElementsByClassName('btn-historial');
-    for (var i = 0; i < btnsHistorial.length; i++) {
-        btnsHistorial[i].addEventListener('click', function() {
-            // Muestra el modal
-            document.getElementById('miModal').classList.remove('hidden');
-        });
-    }
 
-    document.getElementById('cerrarModal').addEventListener('click', function() {
-        // Oculta el modal
-        document.getElementById('miModal').classList.add('hidden');
-    });
-</script>
 <!--MOSTRAR HISTORIAL USUARIO-->
 <script>
+    /*
     $(document).ready(function(){
-        var colors = ['#14B1EC', '#ffffff', '#2ecc71']; // Colores para los bloques de acordeón (azul, blanco, verde)
+        var colors = ['#14B1EC', '#ffffff', '#2ecc71']; 
         var colorIndex = 0;
         var colorCount = colors.length;
         var totalCantidadElement = $('<div>').attr('id', 'total-cantidad');
         
-        $('.btn-historial').click(function(){
-
+        $('.ver-historial').click(function() {
+            console.log("Clic en el botón 'Ver Historial' detectado.");
             var idUsuario = $(this).data('id');
             var fechaString = $(this).data('fecha');
-            // Dividir la cadena en partes (día, mes, año)
+  
             var partesFecha = fechaString.split('/');
             var dia = partesFecha[0];
             var mes = partesFecha[1];
             var año = partesFecha[2];
 
-            // Reformatear la fecha al formato yyyy-mm-dd
+      
             var fechaFormateada = año + '-' + mes + '-' + dia;
             
-            // Crear un objeto Date con la fecha formateada
+        
             var fecha = new Date(fechaFormateada);
-            
 
             $.ajax({
                 url: "{% url 'historialventas' %}",
@@ -342,11 +415,11 @@ var btnsHistorial = document.getElementsByClassName('btn-historial');
                     'fecha': fecha.toISOString()
                 },
                 success: function(data){
-                    // Vaciar el contenido anterior
+                    
                     $('#accordion').empty();
                     var  cantidadbidones = 0;
                     var totalprecio = 0;
-                    // Iterar sobre los datos y agregarlos a los acordeones
+        
                     $.each(data, function(index, item){
                         var collapseId = 'collapse-' + index;
                         var accordionItem = $('<div class="accordion-item w-full">'); // Agregar la clase w-full para ocupar todo el ancho disponible
@@ -354,32 +427,28 @@ var btnsHistorial = document.getElementsByClassName('btn-historial');
                         var accordionCollapse = $('<div id="' + collapseId + '" class="accordion-content" style="display: none;">').text('Detalle: ' + item.detalle + ' - Estado de Pago: ' + item.estadO_PAGO + ' - Método de Pago: ' + item.metodO_PAGO );
                         cantidadbidones = cantidadbidones + item.cantidad;
                         
-                        // Agregar el encabezado y el contenido del acordeón al contenedor de acordeones
+                
                         accordionItem.append(accordionHeader, accordionCollapse);
                         $('#accordion').append(accordionItem);
 
-                        // Alternar el color del bloque de acordeón
+
                         accordionItem.css('background-color', colors[colorIndex]);
 
-                        // Cambiar al siguiente color en el array de colores
                         colorIndex = (colorIndex + 1) % colorCount;
 
-                        // Agregar evento de clic al encabezado para expandir/cerrar el contenido
+    
                         accordionHeader.click(function(){
                             $(this).toggleClass('active');
-                            $(this).toggleClass('collapsed'); // Agregar o quitar la clase collapsed al hacer clic
+                            $(this).toggleClass('collapsed'); 
                             $(this).next('.accordion-content').slideToggle();
                         });
                     });
 
-                    // Mostrar el modal
-                    $('#miModal').removeClass('hidden');
+           
+                    $('#modalHistorialCliente').removeClass('hidden');
                     totalCantidadElement.empty();
-                    
-                // Agrega el valor actualizado de la cantidad total
-                totalCantidadElement.text('Cantidad Total: ' + cantidadbidones);
-                
-                
+              
+                    totalCantidadElement.text('Cantidad Total: ' + cantidadbidones);
                 },
                 error: function(xhr, status, error){
                     console.error('Error al obtener el historial de ventas del usuario:', error);
@@ -387,13 +456,14 @@ var btnsHistorial = document.getElementsByClassName('btn-historial');
             });
         });
 
-        $('#cerrarModal').click(function(){
-            $('#miModal').addClass('hidden');
+        $('#cerrarModalHistorialCliente').click(function(){
+            $('#modalHistorialCliente').addClass('hidden');
         });
-        $('#miModal .modal-content').append(totalCantidadElement);
         
-    });
+        $('#modalHistorialCliente .modal-content').append(totalCantidadElement);
+    });*/
 </script>
+
 <!--MARCAR FILAS CON FECHA ACTUAL-->
 <script>
 $(document).ready(function(){
@@ -422,56 +492,7 @@ $(document).ready(function(){
     });
 });
 </script>
-<!--DETERMINAR TIPO DE VENTA-->
-<script>
-    // Función para verificar y establecer el tipo de venta según el producto seleccionado
-    function establecerTipoVenta() {
-        var selectProducto = document.getElementById('producto');
-        var tipoVentaInput = document.getElementById('tipodeventa');
-        
-        // Obtener el valor seleccionado del producto
-        var productoSeleccionado = selectProducto.options[selectProducto.selectedIndex].text;
-        
-        // Verificar si el producto contiene la palabra "Planta"
-        if (productoSeleccionado.includes('Planta')) {
-            // Si el producto es de tipo "Planta", establecer el tipo de venta como "Planta"
-            tipoVentaInput.value = 'Planta';
-        } else if (productoSeleccionado.includes('Hogar')) {
-            // Si el producto es de tipo "Hogar", establecer el tipo de venta como "Hogar"
-            tipoVentaInput.value = 'Hogar';
-        } else {
-            // Si el producto no coincide con ninguno de los criterios anteriores, dejar el campo de tipo de venta vacío
-            tipoVentaInput.value = '';
-        }
-        habilitarprioridad();
-    }
-    
-    // Agregar un event listener para el cambio en el campo de selección de productos
-    document.getElementById('producto').addEventListener('change', function() {
-        // Llamar a la función para establecer el tipo de venta cada vez que se cambie la selección de productos
-        establecerTipoVenta();
-    });
-    
-    // Llamar a la función para establecer el tipo de venta una vez al cargar la página (en caso de que se haya preseleccionado un producto)
-    establecerTipoVenta();
-</script>
-<!--HABILITAR PRIORIDAD-->
-<script>
-function habilitarprioridad(){
-    var tipoventa = document.getElementById('tipodeventa');
-    var prioridad = document.getElementById('prioridad');
 
-    if(tipoventa.value.toLowerCase() === 'hogar'){
-        prioridad.disabled = false;
-    }
-    else{
-        prioridad.disabled = true;
-        prioridad.selectedIndex = 0;
-    }
-}
-document.getElementById('tipodeventa').addEventListener('input',function(){
-        habilitarprioridad();
-    });
-habilitarprioridad();
-</script>
+
+
 {% endblock %}

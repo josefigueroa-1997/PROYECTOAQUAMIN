@@ -11,8 +11,9 @@ urlpatterns = [
     path('login/',usuarioview.login,name="login"),
     path('logout/',usuarioview.logout,name="logout"),
     path('ruta/',rutaview.obteneruta,name="ruta"),
-    path('obtenerventas/<tipoventa>',ventasview.obtenerventas,name="obtenerventas"),
     path('historialventas/',ventasview.historialventasusuario,name="historialventas"),
     path('recuperarusuarios/',usuarioview.recuperarusuarios,name="recuperarusuarios"),
     path('recuperarproductos/',productoview.recuperarproductos,name="recuperarproductos"),
+    path('ventas/',ventasview.mantenedor_ventas,name="ventas"),
+    path('historial/',ventasview.historialventas,name="historial"),
 ]
