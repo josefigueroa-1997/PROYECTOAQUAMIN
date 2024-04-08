@@ -3,8 +3,63 @@
 {% block title %}Historial{% endblock %}
 {% block css %}
 
+{% endblock %}
 
+{% block content %}
+<table id="tablaHistorial" class="min-w-full divide-y divide-gray-200">
+    <thead class="sticky top-0 ">
+        <tr class="bg-gray-50">
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID Venta</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado Pago</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Metodo Pago</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+        </tr>
+    </thead>
+    {% if historial %}    
+    <tbody id="tablahistorial" class="bg-white divide-y divide-gray-200">
+        {% for h in historial %}
+        <tr>    
+            <td class="px-6 py-4 whitespace-nowrap">{{ h.idventa }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ h.fecha }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ h.tipO_PRODUCTO }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ h.preciounitario }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ h.cantidad }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ h.estadO_PAGO }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ h.metodO_PAGO }}</td>
+            <td class="px-6 py-4 whitespace-nowrap">{{ h.total }}</td>
+        </tr>
+        {% endfor %}
+    {% else %}
+    <p>No hay  registros de historial de compra</p>
+    </tbody>
+    {% endif %}
+</table>
+<div id="totalRow" class="text-right mt-4"></div>
+{% endblock %}
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded',function(){
 
+    });
+    function calcularTotal(){
+        let totalcantidad = 0;
+        let totalvalor = 0;
+        const tablaHistorial = document.getElementById('tablaHistorial');
+        const filas = tablaHistorial.getElementsByTagName('tr');
+        for (let i = 1; i < filas.length; i++) { // Empezamos desde 1 para omitir la fila de encabezado
+            const celdas = filas[i].getElementsByTagName('td');
+            const cantidad = parseInt(celdas[4].innerText);
+            const valor = parseFloat(celdas[7].innerText);
 
-
+            totalCantidad += cantidad;
+            totalValor += valor;
+        }
+        const totalRow = document.getElementById('totalRow');
+        totalRow.innerHTML = `<strong>Total cantidad:</strong> ${totalCantidad}, <strong>Total valor:</strong> ${totalValor.toFixed(2)}`;
+    }
+</script>
 {% endblock %}

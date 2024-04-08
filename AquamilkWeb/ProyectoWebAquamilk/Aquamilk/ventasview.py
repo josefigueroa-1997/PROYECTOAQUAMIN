@@ -33,27 +33,19 @@ def obtenerventas(request,idventa=None,tipoventa=None,fecha=None,idsector=None):
         return render(request, template_name, {'error': mensaje_error})
 
 
-def historialventasusuario(request):
-    url_api = "http://www.aquamilk.somee.com/Venta/GetHistorialCliente"
-    parametros = {'idusuario':request.GET.get('idusuario'),'fecha':request.GET.get('fecha')}
-    try:
-        response = requests.get(url_api,params=parametros)
-        if response.status_code == 200:
-            historial = response.json()
-            return JsonResponse(historial,safe=False)
-        else:
-            mensaje_error = f'Error al obtener usuarios: {response.status_code}'
-            return JsonResponse({'error': mensaje_error})
-    except Exception as e:
-        mensaje_error = f'Error al realizar la solicitud HTTP: {e}'
-        return JsonResponse({'error': mensaje_error})
 
 def historialventas(request):
     context = {}
     template_name ="historial.html"
     url_api = "http://www.aquamilk.somee.com/Venta/GetHistorialCliente"
+    idusuario = request.GET.get('idusuario',None)
+    fecha = request.GET.get('fecha',None)
+    if idusuario is None or fecha is None:
+        context['mensaje_error'] = 'Los parámetros idusuario y fecha son necesarios'
+        return render(request,'error.html',context)
     try:
-        response = requests.get(url_api)
+        params = {'idusuario': idusuario, 'fecha': fecha}
+        response = requests.get(url_api,params=params)
         if response.status_code == 200:
             historial = response.json()
             context['historial'] = historial

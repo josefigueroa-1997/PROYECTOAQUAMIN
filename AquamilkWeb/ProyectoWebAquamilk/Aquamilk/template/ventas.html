@@ -5,6 +5,21 @@
 <link href="{% static 'css/usuario.css'%}" rel="stylesheet" type="text/css">
 <link href="{% static 'css/ventas.css'%}" rel="stylesheet" type="text/css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<style>
+.total-input {
+    background-color: #ffe5e5; 
+    color: #ff0000; 
+}
+.precio-input{
+    background-color: #cbf1a8;
+    color: #336603;
+}
+.despacho-input{
+    background-color: #e3ec8a;
+    color:#808b18
+}
+</style>
+
 {% endblock %}
 
 
@@ -26,6 +41,9 @@
         <li class="mr-6">
             <a href="{% url 'ventas' %}?tipoventa=Hogar" class="text-blue-500 hover:text-blue-800" data-tipoventa="Hogar">Hogar</a>
         </li>
+        <!--<li class="mr-6">
+            <a href="#" id="ventas-fechahoy" class="text-blue-500 hover:text-blue-800" >Ventas de Hoy</a>
+        </li>-->
     </ul>
 
 </div>
@@ -71,10 +89,11 @@
             </td>   
             <td class="px-6 py-4 whitespace-nowrap">{{ venta.comuna }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ venta.total }}</td>
-        
+        {% if venta.nombreUsuario != 'Planta' %}
         <td class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded cursor-pointer ver-historial-btn" data-idusuario="{{ venta.idUsuario }}" data-fecha="{{ venta.fecha }}">
             Ver Historial
         </td>
+        {% endif %}
         
         
         </tr>
@@ -129,7 +148,7 @@
                     <input type="radio" id="pagado" name="estadoPago" value="PAGADO" class="mr-2">
                     <label for="pagado" class="mr-4">Pagado</label>
 
-                    <input type="radio" id="noPagado" name="estadoPago" value="NO_PAGADO" class="mr-2">
+                    <input type="radio" id="noPagado" name="estadoPago" value="NOPAGADO" class="mr-2">
                     <label for="noPagado">No Pagado</label>
                 </div>
             </div>
@@ -152,8 +171,18 @@
             </div>
             <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
                 <label for="Precio" class="block text-sm font-medium text-gray-700">Precio:</label>
-                <input disabled type="text" id="precio" name="precio" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
+                <input disabled type="text" id="precio" name="precio" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500 precio-input">
             </div>
+        </div>
+        <div class="flex flex-wrap -mx-3 mb-4">
+        <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
+            <label for="despacho" class="block text-sm font-medium text-gray-700">Despacho:</label>
+            <input disabled type="text" id="despacho" name="despacho" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500 despacho-input">
+        </div>    
+        <div class="w-full md:w-1/2 px-3 mb-4 md:mb-0">
+            <label for="total" class="block text-sm font-medium text-gray-700">Total:</label>
+            <input disabled type="text" id="total" name="total" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500 total-input">
+        </div>
         </div>
         <input  type="hidden" id="tipodeventa" name="tipodeventa" class="mt-1 p-2 block w-full rounded-md border border-gray-300 focus:border-blue-500">
         <div class="flex justify-end">
@@ -163,19 +192,7 @@
     </form>
 </div>
 
-<!--MODAL HISTORIAL VENTAS CLIENTE-->
-<div id="modalHistorialCliente" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
-    <div class="bg-white p-8 rounded-md max-w-screen-lg">
-        <h2 class="text-lg font-semibold mb-4">Historial Ventas Usuario</h2>
-        <div class="modal-content">
-            <p>fsdogjmfdlkgfjglfkjgfdlgkj</p>
-            <!--<div id="accordion" class="divide-y divide-gray-200"></div>-->
-        </div>
-        
-            <button type="button" id="cerrarModalHistorialCliente" class="ml-2 bg-red-500 text-white px-4 py-2 rounded-md">Cancelar</button>
-        
-    </div>
-</div>
+
 {% endblock %}
 
 {% block scripts %}
@@ -186,38 +203,40 @@
     button.addEventListener('click', function() {
         var idUsuario = this.getAttribute('data-idusuario');
         var fecha = this.getAttribute('data-fecha');
-        window.location.href = '{% url "historial" %}?idusuario=' + idUsuario + '&fecha=' + encodeURIComponent(fecha);
+        // Dividir la cadena en día, mes y año
+var partesFecha = fecha.split('/');
+var dia = partesFecha[0];
+var mes = partesFecha[1];
+var año = partesFecha[2];
+
+// Crear un objeto de fecha en JavaScript (mes - 1 porque los meses van de 0 a 11)
+var fechaFormateada = new Date(año, mes - 1, dia);
+
+// Obtener los componentes de fecha
+var añoFormateado = fechaFormateada.getFullYear();
+var mesFormateado = fechaFormateada.getMonth() + 1; // Sumar 1 porque los meses van de 0 a 11
+var diaFormateado = fechaFormateada.getDate();
+
+// Formatear la fecha en formato 'yyyy-mm-dd'
+var fechaFinal = añoFormateado + '-' + (mesFormateado < 10 ? '0' : '') + mesFormateado + '-' + (diaFormateado < 10 ? '0' : '') + diaFormateado;
+
+        window.location.href = '{% url "historial" %}?idusuario=' + idUsuario + '&fecha=' + encodeURIComponent(fechaFinal );
     });
 });
 </script>
+
 <script>
     document.getElementById('botonPersonalizado').addEventListener('click', function(event) {
         event.stopPropagation();
-        // Oculta el modal de Historial Cliente si está abierto
         
-        // Muestra el modal de Agendar Venta
         $('#modalventa').removeClass('hidden');
     });
 
     document.getElementById('cerrarmodalventa').addEventListener('click', function() {
-        // Oculta el modal de Agendar Venta
         $('#modalventa').addClass('hidden');
     });
 </script>
-<script>
-    // Agregar un evento de clic al botón de historial
-    $('.btnhistorial').click(function() {
-        // Muestra el modal de historial de ventas del cliente
-        $('#modalHistorialCliente').removeClass('hidden');
-        
-    });
 
-    // Agregar un evento de clic al botón de cancelar en el modal de historial de ventas del cliente
-    $('#cerrarModalHistorialCliente').click(function() {
-        // Oculta el modal de historial de ventas del cliente
-        $('#modalHistorialCliente').addClass('hidden');
-    });
-</script>
 <!--OBTENER USUARIOS-->
 <script>
     var selectUsuarios = document.getElementById('usuario');
@@ -254,19 +273,24 @@
   <!--OBTENER PRODUCTOS-->
 <script>
      
-    // Función para cargar los productos en el select2
+    
     function cargarProductosEnSelect2(productos) {
         var selectProducto = $('#producto');
-        selectProducto.empty(); // Limpiar el select2
+        var precioproducto = $('#precio');
+        selectProducto.empty(); 
         
         // Agregar la opción por defecto
         selectProducto.append($('<option>').attr('value', '').text('Selecciona un producto'));
         
         // Agregar las opciones de productos
         productos.forEach(function(producto) {
-            selectProducto.append($('<option>').attr('value', producto.id).text(producto.tipo_Producto + ' - Precio: ' + producto.precio));
+            selectProducto.append($('<option>').attr('value', producto.id).text(producto.tipo_Producto + ' - Precio: ' + producto.precio));  
         });
         
+        selectProducto.change(function(){
+            var precioSeleccionado = $(this).find(':selected').text().split(' - Precio:')[1];
+            precioproducto.val(precioSeleccionado);
+        });
  
       
         
@@ -382,87 +406,7 @@ for(var i= 0;i< rows.length;i++){
 
 </script>
 
-<!--MOSTRAR HISTORIAL USUARIO-->
-<script>
-    /*
-    $(document).ready(function(){
-        var colors = ['#14B1EC', '#ffffff', '#2ecc71']; 
-        var colorIndex = 0;
-        var colorCount = colors.length;
-        var totalCantidadElement = $('<div>').attr('id', 'total-cantidad');
-        
-        $('.ver-historial').click(function() {
-            console.log("Clic en el botón 'Ver Historial' detectado.");
-            var idUsuario = $(this).data('id');
-            var fechaString = $(this).data('fecha');
-  
-            var partesFecha = fechaString.split('/');
-            var dia = partesFecha[0];
-            var mes = partesFecha[1];
-            var año = partesFecha[2];
 
-      
-            var fechaFormateada = año + '-' + mes + '-' + dia;
-            
-        
-            var fecha = new Date(fechaFormateada);
-
-            $.ajax({
-                url: "{% url 'historialventas' %}",
-                method: 'GET',
-                data: {
-                    'idusuario': idUsuario,
-                    'fecha': fecha.toISOString()
-                },
-                success: function(data){
-                    
-                    $('#accordion').empty();
-                    var  cantidadbidones = 0;
-                    var totalprecio = 0;
-        
-                    $.each(data, function(index, item){
-                        var collapseId = 'collapse-' + index;
-                        var accordionItem = $('<div class="accordion-item w-full">'); // Agregar la clase w-full para ocupar todo el ancho disponible
-                        var accordionHeader = $('<div class="accordion-header collapsed">').append($('<button class="accordion-button" type="button">').text('ID Venta: ' + item.idventa + ' - Tipo Producto: ' + item.tipO_PRODUCTO + '- Cantidad: '+item.cantidad+ ' - Total: ' + item.cantidad * item.preciounitario));
-                        var accordionCollapse = $('<div id="' + collapseId + '" class="accordion-content" style="display: none;">').text('Detalle: ' + item.detalle + ' - Estado de Pago: ' + item.estadO_PAGO + ' - Método de Pago: ' + item.metodO_PAGO );
-                        cantidadbidones = cantidadbidones + item.cantidad;
-                        
-                
-                        accordionItem.append(accordionHeader, accordionCollapse);
-                        $('#accordion').append(accordionItem);
-
-
-                        accordionItem.css('background-color', colors[colorIndex]);
-
-                        colorIndex = (colorIndex + 1) % colorCount;
-
-    
-                        accordionHeader.click(function(){
-                            $(this).toggleClass('active');
-                            $(this).toggleClass('collapsed'); 
-                            $(this).next('.accordion-content').slideToggle();
-                        });
-                    });
-
-           
-                    $('#modalHistorialCliente').removeClass('hidden');
-                    totalCantidadElement.empty();
-              
-                    totalCantidadElement.text('Cantidad Total: ' + cantidadbidones);
-                },
-                error: function(xhr, status, error){
-                    console.error('Error al obtener el historial de ventas del usuario:', error);
-                }
-            });
-        });
-
-        $('#cerrarModalHistorialCliente').click(function(){
-            $('#modalHistorialCliente').addClass('hidden');
-        });
-        
-        $('#modalHistorialCliente .modal-content').append(totalCantidadElement);
-    });*/
-</script>
 
 <!--MARCAR FILAS CON FECHA ACTUAL-->
 <script>
@@ -493,6 +437,59 @@ $(document).ready(function(){
 });
 </script>
 
+<!--ESTABLECER DESPACHO-->
+<script>
+    // Función para establecer el valor del campo de despacho
+    function establecerDespacho() {
+        var selectProducto = document.getElementById('producto');
+        var despachoInput = document.getElementById('despacho');
+        var cantidadinput = parseFloat($('#cantidad').val());
+        if (selectProducto && despachoInput) {
+           
+            var selectedIndex = selectProducto.selectedIndex;
 
+            if (selectedIndex > 0) {
+                
+                var productoSeleccionado = selectProducto.options[selectedIndex].text;
+
+                
+                if (productoSeleccionado.includes('Planta') || document.getElementById('tipodeventa').value.toLowerCase() === 'planta') {
+                    
+                    despachoInput.value = '0';
+                } 
+                else {
+                    if (productoSeleccionado.includes('Hogar Poniente') || productoSeleccionado.includes('Hogar Oriente')) {
+                        if (cantidadinput < 4) {
+                            despachoInput.value = productoSeleccionado.includes('Hogar Poniente') ? '1500' : '2000';
+                        } else {
+                            despachoInput.value = '0';
+                        }
+                    }            
+                }
+            }
+        }
+    }
+
+    // Llamar a la función para establecer el valor del campo de despacho cada vez que se cambie la selección de productos o el tipo de venta
+    $(document).on('change input', '#producto, #cantidad', function() {
+        establecerDespacho();
+        calcularTotal(); // Llamar a la función para recalcular el total cuando cambia la cantidad
+    });
+    document.getElementById('tipodeventa').addEventListener('input', function() {
+        establecerDespacho();
+    });
+    /*CALCULAR PRECIO TOTAL*/
+    function calcularTotal(){
+    var cantidad = parseFloat($('#cantidad').val());
+    var precio = parseFloat($('#precio').val());
+    var despacho = parseFloat($('#despacho').val());
+    var total = cantidad * precio+ despacho;
+    $('#total').val(total.toFixed(2));
+}
+$('#cantidad, #precio,#despacho').on('input',function(){
+    calcularTotal();
+});
+
+</script>
 
 {% endblock %}
