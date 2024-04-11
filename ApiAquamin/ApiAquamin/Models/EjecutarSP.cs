@@ -576,7 +576,7 @@ namespace ApiAquamin.Models
                     {
                         var venta = new VentaDTO()
                         {
-                            NumeroVenta = reader.GetInt32(reader.GetOrdinal("NumeroVenta")),
+                            NumeroVenta = reader.IsDBNull(reader.GetOrdinal("NumeroVenta")) ? 0 : reader.GetInt32(reader.GetOrdinal("NumeroVenta")),
                             Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")).ToString("dd/MM/yyyy"),
                             IdUsuario = reader.GetInt32(reader.GetOrdinal("IDUSUARIO")),
                             NombreUsuario = reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),

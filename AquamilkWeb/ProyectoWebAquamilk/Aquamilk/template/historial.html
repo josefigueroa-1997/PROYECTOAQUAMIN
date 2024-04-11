@@ -43,7 +43,7 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded',function(){
-
+        calcularTotal();
     });
     function calcularTotal(){
         let totalcantidad = 0;
@@ -55,11 +55,11 @@
             const cantidad = parseInt(celdas[4].innerText);
             const valor = parseFloat(celdas[7].innerText);
 
-            totalCantidad += cantidad;
-            totalValor += valor;
+            totalcantidad += cantidad;
+            totalvalor += valor;
         }
         const totalRow = document.getElementById('totalRow');
-        totalRow.innerHTML = `<strong>Total cantidad:</strong> ${totalCantidad}, <strong>Total valor:</strong> ${totalValor.toFixed(2)}`;
+        totalRow.innerHTML = `<strong>Total cantidad de Bidones:</strong> ${totalcantidad}, <strong>Total valor:</strong> ${totalvalor.toFixed(2)}`;
     }
 </script>
 {% endblock %}
