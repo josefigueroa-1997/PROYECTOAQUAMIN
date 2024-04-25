@@ -61,4 +61,16 @@
         color: green;
         border-color: 2px solid green;
     }
+    .total-input {
+        background-color: #ffe5e5; 
+        color: #ff0000; 
+    }
+    .precio-input{
+        background-color: #cbf1a8;
+        color: #336603;
+    }
+    .despacho-input{
+        background-color: #e3ec8a;
+        color:#808b18
+    }
     

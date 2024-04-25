@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 import requests
-from django.http import JsonResponse
+from django.http import JsonResponse,HttpResponse,HttpResponseBadRequest
 from datetime import datetime
 
 
@@ -101,6 +101,18 @@ def agendar_venta(request):
             return render(request, 'error.html', {'mensaje_error': mensaje_error})
 
 
+def eliminar_venta(request,id_venta):
+    if request.POST:
+        api_url = f"http://www.aquamilk.somee.com/Venta/DeleteVenta/{id_venta}"
+        try:
+            response = requests.delete(api_url)
+            if response.status_code == 200:
+                return HttpResponse("Venta eliminada con éxito")
+            else:
+                return HttpResponseBadRequest("No se pudo eliminar la venta")
+        except Exception as e:
+            return HttpResponseBadRequest(f"Error al realizar la solicitud HTTP: {e}")
+
 def mantenedor_ventas(request):
     if request.POST:
         return agendar_venta(request)
@@ -109,3 +121,6 @@ def mantenedor_ventas(request):
         if tipoventa == 'Hogar':  
             return obtenerventas(request, tipoventa=tipoventa)
         return obtenerventas(request, tipoventa)
+    
+  
+

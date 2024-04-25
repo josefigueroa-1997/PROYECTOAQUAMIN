@@ -3,6 +3,7 @@
     public class RutaDTO
     {
         public int NumeroDespacho{ get; set; }
+        public int NumeroVenta { get; set; }
         public DateTime Fecha { get; set; }
         public string NombreUsuario { get; set; } = null!;
         public int VEINTELTS { get; set; }

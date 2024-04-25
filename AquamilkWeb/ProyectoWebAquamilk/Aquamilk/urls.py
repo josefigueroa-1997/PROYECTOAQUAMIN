@@ -15,4 +15,5 @@ urlpatterns = [
     path('recuperarproductos/',productoview.recuperarproductos,name="recuperarproductos"),
     path('ventas/',ventasview.mantenedor_ventas,name="ventas"),
     path('historial/',ventasview.historialventas,name="historial"),
+    path('eliminar_venta/',ventasview.eliminar_venta,name="eliminar_venta"),
 ]

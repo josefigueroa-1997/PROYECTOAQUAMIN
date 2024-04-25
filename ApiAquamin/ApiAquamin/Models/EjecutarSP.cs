@@ -577,6 +577,7 @@ namespace ApiAquamin.Models
                         var venta = new VentaDTO()
                         {
                             NumeroVenta = reader.IsDBNull(reader.GetOrdinal("NumeroVenta")) ? 0 : reader.GetInt32(reader.GetOrdinal("NumeroVenta")),
+                            IdVenta = reader.GetInt32(reader.GetOrdinal("IDVENTA")),
                             Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")).ToString("dd/MM/yyyy"),
                             IdUsuario = reader.GetInt32(reader.GetOrdinal("IDUSUARIO")),
                             NombreUsuario = reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
@@ -703,26 +704,7 @@ namespace ApiAquamin.Models
         }
 
         //METODOS RUTADESPACHO
-        public async Task<bool> IngresarRutaDespacho()
-        {
-            try
-            {
-                DbConnection connection = await conexion.OpenDatabaseConnectionAsync();
-                using(DbCommand cmd = connection.CreateCommand())
-                {
-                    cmd.CommandText = "INRESARRUTADESPACHO";
-                    cmd.CommandType = CommandType.StoredProcedure;
-                    await cmd.ExecuteNonQueryAsync();
-                }
-                await conexion.CloseDatabaseConnectionAsync();
-                return true;
-            }
-            catch(Exception e)
-            {
-                Debug.WriteLine($"Error al ingresar la venta en la ruta de despacho:{e.Message}");
-                return false;
-            }
-        }
+       
         //DESPLEGARRUTA
         public async Task<List<RutaDTO>> DesplegarRuta(int id)
         {
@@ -741,6 +723,7 @@ namespace ApiAquamin.Models
                         var ruta = new RutaDTO()
                         {
                             NumeroDespacho = reader.IsDBNull(reader.GetOrdinal("NumeroDespacho")) ? 0 : reader.GetInt32(reader.GetOrdinal("NumeroDespacho")),
+                            NumeroVenta = reader.IsDBNull(reader.GetOrdinal("NUMEROVENTA")) ? 0 : reader.GetInt32(reader.GetOrdinal("NUMEROVENTA")),
                             Fecha = reader.GetDateTime(reader.GetOrdinal("FECHA")),
                             NombreUsuario = reader.IsDBNull(reader.GetOrdinal("NOMBREUSUARIO")) ? "" : reader.GetString(reader.GetOrdinal("NOMBREUSUARIO")),
                             VEINTELTS = reader.IsDBNull(reader.GetOrdinal("VEINTELTS")) ? 0 : reader.GetInt32(reader.GetOrdinal("VEINTELTS")),

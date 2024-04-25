@@ -13,22 +13,7 @@ namespace ApiAquamin.Services
         {
             this.ejecutarSP = ejecutarSP;
         }
-        public async Task<bool> IngresarRuta()
-        {
-            try
-            {
-                bool insertar = await ejecutarSP.IngresarRutaDespacho();
-                if (insertar)
-                    return true;
-                else
-                    return false;
-            }
-            catch
-            {
-                return false;
-            }
-                
-        }
+       
         public async Task<List<RutaDTO>> DesplegarRuta(int id)
         {
             try

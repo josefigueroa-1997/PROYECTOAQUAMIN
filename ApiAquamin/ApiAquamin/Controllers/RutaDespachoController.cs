@@ -15,16 +15,7 @@ namespace ApiAquamin.Controllers
         {
             this.rutaDespacho = rutaDespacho;
         }
-        [HttpPost]
-        [Route("AddDespacho")]
-        public async Task<IActionResult> AddDespacho()
-        {
-            bool resultado = await rutaDespacho.IngresarRuta();
-            if (resultado)
-                return Ok("Se gregó una venta a ruta");
-            else
-                return BadRequest("Error al ingresar la venta a la ruta");
-        }
+        
         [HttpGet]
         [Route("GetRuta/{id}")]
         public async Task<IActionResult> GetRuta(int id)

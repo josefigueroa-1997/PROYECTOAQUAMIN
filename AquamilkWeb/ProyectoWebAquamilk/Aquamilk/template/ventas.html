@@ -6,17 +6,8 @@
 <link href="{% static 'css/ventas.css'%}" rel="stylesheet" type="text/css">
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <style>
-.total-input {
-    background-color: #ffe5e5; 
-    color: #ff0000; 
-}
-.precio-input{
-    background-color: #cbf1a8;
-    color: #336603;
-}
-.despacho-input{
-    background-color: #e3ec8a;
-    color:#808b18
+.total-dia{
+    color: red;
 }
 </style>
 
@@ -41,9 +32,6 @@
         <li class="mr-6">
             <a href="{% url 'ventas' %}?tipoventa=Hogar" class="text-blue-500 hover:text-blue-800" data-tipoventa="Hogar">Hogar</a>
         </li>
-        <!--<li class="mr-6">
-            <a href="#" id="ventas-fechahoy" class="text-blue-500 hover:text-blue-800" >Ventas de Hoy</a>
-        </li>-->
     </ul>
 
 </div>
@@ -65,6 +53,7 @@
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comuna</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
             <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Historial</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Eliminar</th>
         </tr>
     </thead>
     {% if ventas %}    
@@ -88,23 +77,31 @@
                 {% endif %}
             </td>   
             <td class="px-6 py-4 whitespace-nowrap">{{ venta.comuna }}</td>
-        <td class="px-6 py-4 whitespace-nowrap">{{ venta.total }}</td>
+        <td class="px-6 py-4 whitespace-nowrap total-venta">{{ venta.total }}</td>
         {% if venta.nombreUsuario != 'Planta' %}
         <td class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded cursor-pointer ver-historial-btn" data-idusuario="{{ venta.idUsuario }}" data-fecha="{{ venta.fecha }}">
             Ver Historial
         </td>
+        {% else %}
+        <td>
+            None
+        </td>
         {% endif %}
-        
+        <td class="bg-red-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded cursor-pointer eliminar-venta" data-id="{{ venta.idVenta}}" >
+            Eliminar
+        </td>
         
         </tr>
         
         {% endfor %}
     </tbody>
     {% endif %}
+    
 </table>
 
 </div>
 </div>
+<div id="total-venta-container" class="text-right font-bold total-dia">Total del día: <span id="total-venta-valor"></span></div>
 <!-- Modal Agregar Usuario -->
 <div id="modalventa" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 hidden">
     <div class="bg-white p-8 rounded-md max-w-screen-lg">
@@ -490,6 +487,61 @@ $('#cantidad, #precio,#despacho').on('input',function(){
     calcularTotal();
 });
 
+</script>
+
+<script>
+
+    $(document).ready(function(){
+        calcularTotalVentahoy();
+    });
+
+    function calcularTotalVentahoy(){
+        var currentDate = new Date().toISOString().split('T')[0];
+        var totalVentaHoy = 0;
+        $('#tablaventas tbody tr').each(function(){
+
+            var fechaventa = $(this).find('td:eq(1)').text().trim();
+            var fechaFormateada = fechaventa.split('/').reverse().join('-');
+            if(fechaFormateada === currentDate){
+                var totalventa = parseFloat($(this).find('.total-venta').text());
+                if(!isNaN(totalventa)){
+                    totalVentaHoy += totalventa;
+                }
+            }
+        });
+        $('#total-venta-valor').text(totalVentaHoy.toFixed(2));
+    }
+
+</script>
+
+<script>
+    // Event listener para el botón de eliminar venta
+    $(document).on('click', '.eliminar-venta', function() {
+        // Obtener el ID de la venta desde el atributo data
+        var ventaId = $(this).data('id');
+        console.log(ventaId);
+        // Confirmar si el usuario desea eliminar la venta
+        if (confirm("¿Estás seguro de que deseas eliminar esta venta?")) {
+            // Realizar la solicitud AJAX para eliminar la venta
+            $.ajax({
+                type: 'POST',
+                url: '{% url "eliminar_venta" %}',
+                data: {
+                    'id_venta': ventaId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(data) {
+                    // Actualizar la página o realizar cualquier otra acción necesaria después de eliminar la venta
+                    location.reload(); // Recargar la página
+                },
+                error: function(xhr, status, error) {
+                    // Manejar el error en caso de que ocurra algún problema durante la solicitud AJAX
+                    console.error('Error al eliminar la venta:', error);
+                    alert('Error al eliminar la venta. Por favor, inténtalo de nuevo más tarde.');
+                }
+            });
+        }
+    });
 </script>
 
 {% endblock %}
